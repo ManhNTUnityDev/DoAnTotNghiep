@@ -3,7 +3,202 @@ guid: 83b9432ab5f6d2741aee87a017a1b80f
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Added-Sign
+    second: {fileID: 2100000, guid: 2f44bc2fb0fa543419af20ae28835afb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Ads-16x9
+    second: {fileID: 2100000, guid: bc0288e9915ad4d689cdd42bdb20bdc3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Ads-300x250
+    second: {fileID: 2100000, guid: 2e7f765fc363747a9849637a85b3d45a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Ads-480x320
+    second: {fileID: 2100000, guid: c535f1e9ee99c4ceda28967d86c46af3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Barn-Area
+    second: {fileID: 2100000, guid: 7366cd945338e474680ab44fb3c8d305, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Carfield
+    second: {fileID: 2100000, guid: 2914b9f76de0d4334a003e24e1bfceb6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Grass_Green
+    second: {fileID: 2100000, guid: 5e40d6efc9936485daf358f7cb8b4eb5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Grass_Yellow
+    second: {fileID: 2100000, guid: fd999eef6f0fd4859b6e994a7362c0c8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Ground
+    second: {fileID: 2100000, guid: aa0074676d1df45eab13da1204734f40, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Leaf
+    second: {fileID: 2100000, guid: 5b0b9a41b45f34986b30844f2cddb054, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Main_Barn
+    second: {fileID: 2100000, guid: bb34a4ba4430b4beaab4919a036d53f1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Map_Decor
+    second: {fileID: 2100000, guid: acad97141d53e49e1a68c9c01f8d5943, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Modular
+    second: {fileID: 2100000, guid: 2ae2b6858a1be4465a524df5c8d7c660, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Pond
+    second: {fileID: 2100000, guid: 2a14a2e5f900d4dc0962e8dd66116f09, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Shelf-Button
+    second: {fileID: 2100000, guid: aca0739bc8d924643a21fe3a8e7db6de, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Shelf-Button_Selected
+    second: {fileID: 2100000, guid: cd08d9ae773c545bdafb9f64afc02bef, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Windmill
+    second: {fileID: 2100000, guid: 552fad564ae9a49198d505833f60a5cf, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_XH-P
+    second: {fileID: 2100000, guid: fbaae2311404f44948050e4228642427, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_rock_set
+    second: {fileID: 2100000, guid: 9138fb07ba0434df2b1002d810c54e75, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_water_pumping
+    second: {fileID: 2100000, guid: a140943e93b2645fdbc582a85d4e8ca4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Tilling_Wood_L
+    second: {fileID: 2100000, guid: 311c7d8015c234368a88a297c50df62b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Tilling_Wood_SD
+    second: {fileID: 2100000, guid: bb833698460674c57a92c877b4b87c73, type: 2}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Car_Field
+    second: {fileID: 2800000, guid: 02e40ef966e2d40f199ca6485d65da06, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Grass_PNG_02
+    second: {fileID: 2800000, guid: f82f09bc06e334809b1ac84d1c3076d0, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Grass_PNG_03
+    second: {fileID: 2800000, guid: e78a76136f22c427fb19664080dea5d1, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_Added-Sign
+    second: {fileID: 2800000, guid: 78e63c90e455e4a47874fcccd45f7638, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_Barn-Area
+    second: {fileID: 2800000, guid: 695326e22a0154f20925fa2b9299d6cc, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_Ground
+    second: {fileID: 2800000, guid: 83446ccfb7dba49c1b50a0f220903930, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_Leaf
+    second: {fileID: 2800000, guid: 883cdfc8ca0a243f9bee188a3404bb4b, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_M_gr
+    second: {fileID: 2800000, guid: 6e613c9acb5f4458e856271953ded620, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_M_rock_set
+    second: {fileID: 2800000, guid: fa3383180549c44f78f2710e10981de4, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_Map_Decor
+    second: {fileID: 2800000, guid: c32f6c34e676c4634b4bb159310f2bf2, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_Modular
+    second: {fileID: 2800000, guid: e50f79886f5a64ca2be01279ac63f25f, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_Shelf-Button
+    second: {fileID: 2800000, guid: 13defe17e6c2848a78004fc30f6f8719, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_Shelf-Button_Selected
+    second: {fileID: 2800000, guid: 4aceeb55dd94242e1afc0a094287660a, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_Tilling_Wood_L
+    second: {fileID: 2800000, guid: f2c735ace26ca4ab0b6c696cb1285119, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_Tilling_Wood_SD
+    second: {fileID: 2800000, guid: 6803cd39afb5c4f22b9406d01ef25309, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_WaterTree_N
+    second: {fileID: 2800000, guid: e60d3a200293345b5a475058f2b2be57, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_WindMill
+    second: {fileID: 2800000, guid: e685dd51f44b64db9944f5c64d7aac99, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0

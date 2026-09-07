@@ -3,7 +3,72 @@ guid: a16c3a89fd2bf6344acf136d26cdd4c4
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Grass_Green
+    second: {fileID: 2100000, guid: 92cb3bd8019fa419da552ef2de29565d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Ground
+    second: {fileID: 2100000, guid: 311664b9b17c74a88a8e669af36909f8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Leaf
+    second: {fileID: 2100000, guid: a8b5924315acc48f6a1bb7d45a7dd4b7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Modular
+    second: {fileID: 2100000, guid: 841e172ed91a24de8ad749d5382afd27, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Rock-kit-1
+    second: {fileID: 2100000, guid: f4f3ebbdf352f4329a9ccedcb57f44f0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Rock-kit-2
+    second: {fileID: 2100000, guid: 22b14f634628d46f88772d9ae31b2050, type: 2}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Grass_PNG_02
+    second: {fileID: 2800000, guid: b065027f41ca24145b491961fba99631, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Grass_PNG_03
+    second: {fileID: 2800000, guid: 704dd35b25f044a459077eda27dbcb41, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_Ground
+    second: {fileID: 2800000, guid: 1aeffba0067114d6c8ea6b7805e1e851, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_Leaf
+    second: {fileID: 2800000, guid: 01781b41156934360b4f3e3ef855af48, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_Modular
+    second: {fileID: 2800000, guid: cf7f912badee24b458da81e7d6437d10, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_Rock-kit-1
+    second: {fileID: 2800000, guid: c6b5c23c7b1bb40ed83844b2028d13c1, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_Rock-kit-2.png
+    second: {fileID: 2800000, guid: e2f93ea1a581647718b529d1ced4edc1, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -34,7 +99,7 @@ ModelImporter:
   meshes:
     lODScreenPercentages: []
     globalScale: 1
-    meshCompression: 0
+    meshCompression: 1
     addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
