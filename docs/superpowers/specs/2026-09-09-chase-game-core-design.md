@@ -2,7 +2,7 @@
 
 - **Date:** 2026-09-09
 - **Status:** Design approved, pending implementation plan
-- **Scope:** Core system — characters, role assignment, spawning, AI, capture/jail/rescue, win/lose conditions
+- **Scope:** Core system — characters, role assignment, spawning, AI, capture/jail/rescue, win/lose conditions, UI framework
 
 ---
 
@@ -454,3 +454,102 @@ SpawnManager.SpawnMatch(playerTeam):
 - Install the **VContainer** package.
 - Create an installer MonoBehaviour in the Game scene holding prefab/spawn-point/config refs.
 - Additional config assets: `AIConfig` (RescueThreatRadius, tick rate, vision...), `MatchConfig`.
+
+---
+---
+
+# CHAPTER C — UI Architecture
+
+This chapter designs the **UI framework** (skeleton), not concrete screen layouts. Screen *content* is deferred until visual references/mockups exist; the framework defines how any screen plugs in.
+
+Locked decisions:
+
+| Topic | Decision |
+|-------|----------|
+| UI tech | **uGUI + DOTween** (already used by the project; `LoadingBar` sets the style) |
+| View pattern | **Plain MonoBehaviour views** — injected via VContainer, subscribe to gameplay events |
+| Screen management | **Centralized `UIManager`** — one authority for show/hide, screen flow, layering |
+| Worldspace UI | **None for now** — rescue progress moves into the screen-space runner HUD |
+
+**Division of duties** (keeps `UIManager` from becoming a God-object):
+- `UIManager` owns **navigation** — which screen is shown, transitions, layering rules.
+- Each view owns **its own data** — e.g. the HUD subscribes to timer/roster/cooldowns to update its widgets.
+
+## UI architecture diagram
+
+```mermaid
+flowchart TD
+    subgraph UI["UI layer (uGUI, Game scene)"]
+        UM["UIManager<br/>show/hide, screen flow, layering"]
+        HUD["HudController + 2 HUD panels"]
+        RES["Result panel"]
+        CD["Countdown panel"]
+        PAUSE["Pause overlay (later)"]
+        UM --> HUD
+        UM --> RES
+        UM --> CD
+        UM --> PAUSE
+    end
+
+    MM["MatchManager"] -. "flow events: Preparing / Playing / Ended" .-> UM
+    TR["TeamRoster"] -. "data events" .-> HUD
+    MT["MatchTimer"] -. "tick" .-> HUD
+    AB["player CharacterAbilities"] -. "cooldown" .-> HUD
+```
+
+## C1. `UIManager` — screen authority (DI-registered, injected)
+
+- **Panel registry:** holds the list of `UIView`s (assigned via installer/Inspector, or injected as `IReadOnlyList<UIView>`).
+- **API:** `Show(screenId)` / `Hide(screenId)` (or `Show<TView>()`), using `UIView.Show/Hide` (DOTween) underneath.
+- **Layering rules:**
+  - **Full screens** are mutually exclusive: Loading, Countdown, Result, (MainMenu later).
+  - **HUD** is the base layer during a match; **overlays** (Pause/dialog) stack on top → a small **overlay stack** for back navigation.
+- **Driven by `MatchManager` flow events:**
+  ```
+  Preparing → Show(Countdown)
+  Playing   → Show(HUD) + HudController.Bind(player, team)
+  Ended     → Show(Result, matchResult)
+  ```
+
+## C2. `UIView` (base MonoBehaviour) — no longer self-toggles visibility
+
+- `Show()` / `Hide()` (DOTween fade, consistent with `LoadingBar`) + an **identity** (`ScreenId`/type) so `UIManager` can address it.
+- **Still binds its own data:** subscribes to source events in `Awake/Start`, unsubscribes in `OnDestroy`. Only *visibility authority* moves to `UIManager`.
+
+## C3. `HudController`
+
+A specialized view under `UIManager`: when the match enters `Playing`, `UIManager` calls `Bind(player, team)` to pick the chaser/runner HUD variant and start feeding data.
+
+**HUD data sources (content-agnostic mapping):**
+
+| Widget | Source |
+|--------|--------|
+| Timer | `MatchTimer` |
+| Free-runner / jailed counts | `TeamRoster` queries + `OnRunnerCaught/Rescued` events |
+| Skill / gun cooldown (0..1) | player's `CharacterAbilities` |
+| Rescue progress | `Cage` exposes progress via event/property → runner HUD (since worldspace was dropped) |
+| Match end | `MatchManager.OnMatchEnded` → `UIManager` shows Result |
+
+## C4. Adding a new screen (contract, once references exist)
+
+> 1 panel prefab + 1 `UIView` subclass (declares identity + `[Inject]` + subscribes to its data) → **register it in the `UIManager` registry** → `UIManager` calls Show/Hide at the right time. No gameplay changes.
+
+## C5. DI registration
+
+`RegisterComponentInHierarchy<UIView>()` (or an installer wires `UIManager` + panels) so `[Inject]` runs on the in-scene views, and `UIManager` receives the panel registry.
+
+## C6. Screen slots the framework must support (content designed later)
+
+| Slot | Triggered by | Status |
+|------|--------------|--------|
+| Chaser HUD / Runner HUD | `HudController.Bind(player, team)` | framework ready, layout TBD |
+| Start countdown | `UIManager` on `Preparing` | framework ready, layout TBD |
+| Result (win/lose) | `MatchManager.OnMatchEnded` | framework ready, layout TBD |
+| Pause / Main menu | later | deferred |
+
+## C7. Deferred to implementation (UI)
+
+- Concrete layout/content of every screen (needs visual references).
+- Canvas render mode (Screen Space - Overlay vs Camera) and scaling setup.
+- Exact DOTween transitions per screen.
+- Whether HUD panels are separate prefabs or one panel with swapped sub-trees.
