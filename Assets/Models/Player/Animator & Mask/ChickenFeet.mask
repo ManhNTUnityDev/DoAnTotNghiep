@@ -1,0 +1,105 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ChickenFeet
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: Armature
+    m_Weight: 1
+  - m_Path: Armature/Bone
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.L
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.L/Feet.L
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.L/Feet.L/toe.01.L
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.L/Feet.L/toe.01.L/toe.01_end.L
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.L/Feet.L/toe.02.L
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.L/Feet.L/toe.02.L/toe.02_end.L
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.L/Feet.L/toe.03.L
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.L/Feet.L/toe.03.L/toe.03_end.L
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.R
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.R/Feet.R
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.R/Feet.R/toe.01.R
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.R/Feet.R/toe.01.R/toe.01_end.R
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.R/Feet.R/toe.02.R
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.R/Feet.R/toe.02.R/toe.02_end.R
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.R/Feet.R/toe.03.R
+    m_Weight: 1
+  - m_Path: Armature/Bone/IK.R/Feet.R/toe.03.R/toe.03_end.R
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001/hong
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001/hong/Tail.L.01
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001/hong/Tail.L.01/Tail.L.02
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001/hong/Tail.m01
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001/hong/Tail.m01/Tail.m02
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001/hong/Tail.R.01
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001/hong/Tail.R.01/Tail.R.02
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001/spine.002
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001/spine.002/head
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001/spine.002/head/beak.001
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001/spine.002/head/beak.002
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001/spine.002/head/Eye.L
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001/spine.002/head/Eye.R
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001/spine.002/head/mao.001
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/spine.001/spine.002/shoulder.L
+    m_Weight: 0
+  - m_Path: Armature/Bone/spine/spine.001/spine.002/shoulder.L/upper_arm.L
+    m_Weight: 0
+  - m_Path: Armature/Bone/spine/spine.001/spine.002/shoulder.R
+    m_Weight: 0
+  - m_Path: Armature/Bone/spine/spine.001/spine.002/shoulder.R/upper_arm.R
+    m_Weight: 0
+  - m_Path: Armature/Bone/spine/thigh.L
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/thigh.L/shin.L
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/thigh.R
+    m_Weight: 1
+  - m_Path: Armature/Bone/spine/thigh.R/shin.R
+    m_Weight: 1
+  - m_Path: Armature/Bone/thigh.L.001
+    m_Weight: 1
+  - m_Path: Armature/Bone/thigh.R.001
+    m_Weight: 1
+  - m_Path: Armature/Ctrl
+    m_Weight: 1
+  - m_Path: Chic.001
+    m_Weight: 1
