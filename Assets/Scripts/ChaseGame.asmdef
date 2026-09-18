@@ -3,7 +3,8 @@
     "rootNamespace": "ChaseGame",
     "references": [
         "VContainer",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "DOTween.Modules"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
