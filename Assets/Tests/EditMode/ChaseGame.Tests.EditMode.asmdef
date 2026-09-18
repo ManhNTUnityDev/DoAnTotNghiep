@@ -1,0 +1,26 @@
+{
+    "name": "ChaseGame.Tests.EditMode",
+    "rootNamespace": "ChaseGame.Tests",
+    "references": [
+        "ChaseGame",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "VContainer",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
