@@ -5,10 +5,23 @@ namespace ChaseGame.Input
 {
     public class InputSystemService : IInputService
     {
+        private readonly IJoystickInput joystick;
+
+        public InputSystemService(IJoystickInput joystick)
+        {
+            this.joystick = joystick;
+        }
+
         public Vector2 MoveAxis
         {
             get
             {
+                // On-screen joystick wins while it is being touched (mobile).
+                if (joystick != null && joystick.Active)
+                {
+                    return Vector2.ClampMagnitude(joystick.Axis, 1f);
+                }
+
                 Vector2 axis = Vector2.zero;
 
                 var keyboard = Keyboard.current;

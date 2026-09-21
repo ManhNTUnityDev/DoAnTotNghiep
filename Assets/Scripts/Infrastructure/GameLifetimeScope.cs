@@ -9,6 +9,10 @@ namespace ChaseGame.Infrastructure
     {
         protected override void Configure(IContainerBuilder builder)
         {
+            // The on-screen joystick adapter (a MonoBehaviour in the scene). Registered by
+            // interface so this scope never names the Assembly-CSharp concrete type.
+            builder.RegisterComponentInHierarchy<IJoystickInput>();
+
             builder.Register<IInputService, InputSystemService>(Lifetime.Singleton);
 
             // The single Character currently placed in the Game scene.
