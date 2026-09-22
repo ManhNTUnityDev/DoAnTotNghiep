@@ -42,5 +42,28 @@ namespace ChaseGame.Tests
             Assert.AreEqual(1f, dir.magnitude, 1e-4f);
             Assert.AreEqual(1f, dir.z, 1e-4f);
         }
+
+        [Test]
+        public void ShouldStopAtDestination_WithinStoppingDistance_ReturnsTrue()
+        {
+            // Arrived: not still computing a path, and inside the stopping radius.
+            Assert.IsTrue(CharacterMovement.ShouldStopAtDestination(
+                pathPending: false, remainingDistance: 0.1f, stoppingDistance: 0.25f));
+        }
+
+        [Test]
+        public void ShouldStopAtDestination_BeyondStoppingDistance_ReturnsFalse()
+        {
+            Assert.IsFalse(CharacterMovement.ShouldStopAtDestination(
+                pathPending: false, remainingDistance: 5f, stoppingDistance: 0.25f));
+        }
+
+        [Test]
+        public void ShouldStopAtDestination_PathStillPending_ReturnsFalse()
+        {
+            // While the path is being computed remainingDistance reads 0; must not stop early.
+            Assert.IsFalse(CharacterMovement.ShouldStopAtDestination(
+                pathPending: true, remainingDistance: 0f, stoppingDistance: 0.25f));
+        }
     }
 }

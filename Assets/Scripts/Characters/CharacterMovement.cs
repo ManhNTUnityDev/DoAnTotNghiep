@@ -37,6 +37,15 @@ namespace ChaseGame.Characters
             return desiredVelocity.normalized;
         }
 
+        // Because the body is driven at full speed (magnitude is discarded), the
+        // near-zero desiredVelocity clamp alone can let the controller overshoot the
+        // destination and oscillate. Once the path is resolved and we are within the
+        // agent's stopping distance, stop cleanly instead of steering by desiredVelocity.
+        public static bool ShouldStopAtDestination(bool pathPending, float remainingDistance, float stoppingDistance)
+        {
+            return !pathPending && remainingDistance <= stoppingDistance;
+        }
+
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
@@ -81,7 +90,9 @@ namespace ChaseGame.Characters
         {
             if (mode == Mode.Agent && agent != null)
             {
-                moveDirection = DesiredToDirection(agent.desiredVelocity);
+                moveDirection = ShouldStopAtDestination(agent.pathPending, agent.remainingDistance, agent.stoppingDistance)
+                    ? Vector3.zero
+                    : DesiredToDirection(agent.desiredVelocity);
             }
 
             float speed = stats != null ? stats.MoveSpeed : 5f;
