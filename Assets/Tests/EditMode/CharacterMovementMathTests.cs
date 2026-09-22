@@ -27,5 +27,20 @@ namespace ChaseGame.Tests
             var v = CharacterMovement.ComputeVelocity(new Vector3(1f, 0f, 1f), 5f);
             Assert.AreEqual(5f, v.magnitude, 1e-4f);
         }
+
+        [Test]
+        public void DesiredToDirection_NearZeroVelocity_IsZero()
+        {
+            var dir = CharacterMovement.DesiredToDirection(new Vector3(1e-4f, 0f, 0f));
+            Assert.AreEqual(Vector3.zero, dir);
+        }
+
+        [Test]
+        public void DesiredToDirection_NonZero_IsUnitLength()
+        {
+            var dir = CharacterMovement.DesiredToDirection(new Vector3(0f, 0f, 4f));
+            Assert.AreEqual(1f, dir.magnitude, 1e-4f);
+            Assert.AreEqual(1f, dir.z, 1e-4f);
+        }
     }
 }
