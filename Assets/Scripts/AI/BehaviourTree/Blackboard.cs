@@ -16,5 +16,6 @@ namespace ChaseGame.AI.BehaviourTree
         public Transform NearestThreat;  // runner: nearest visible chaser
 
         public Vector3? Destination;     // scratch for wander / flee targets
+        public Vector3? GuardPost;       // chaser: cage post assigned by ChaserCoordinator
     }
 }

@@ -10,6 +10,12 @@ namespace ChaseGame.Infrastructure
 
         private Vector3 velocity;
 
+        // Retargeted at runtime by the SpawnManager once the player character exists.
+        public void SetTarget(Transform newTarget)
+        {
+            target = newTarget;
+        }
+
         private void LateUpdate()
         {
             if (target == null)

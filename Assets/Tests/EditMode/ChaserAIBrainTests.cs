@@ -54,6 +54,36 @@ namespace ChaseGame.Tests
         }
 
         [Test]
+        public void WhenGuardPostSet_AndNoTarget_MovesToGuardPost()
+        {
+            var (ch, spy, brain) = MakeChaser();
+            var post = new Vector3(7f, 0f, -2f);
+
+            brain.Blackboard.CurrentTarget = null;
+            brain.Blackboard.GuardPost = post;
+            brain.TickForTests();
+
+            Assert.AreEqual(1, spy.MoveToCallCount);
+            Assert.AreEqual(post, spy.LastDestination);
+        }
+
+        [Test]
+        public void WhenTargetPresent_ChasesTarget_EvenIfGuarding()
+        {
+            var (ch, spy, brain) = MakeChaser();
+            var target = new GameObject("Runner");
+            spawned.Add(target);
+            target.transform.position = new Vector3(4f, 0f, 0f);
+
+            brain.Blackboard.GuardPost = new Vector3(7f, 0f, -2f);
+            brain.Blackboard.CurrentTarget = target.transform;
+            brain.TickForTests();
+
+            // Active hunting outranks holding the cage post.
+            Assert.AreEqual(new Vector3(4f, 0f, 0f), spy.LastDestination);
+        }
+
+        [Test]
         public void WhenJailed_DoesNotChase()
         {
             var (ch, spy, brain) = MakeChaser();

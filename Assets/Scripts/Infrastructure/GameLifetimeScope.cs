@@ -1,12 +1,16 @@
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using ChaseGame.Characters;
+using ChaseGame.AI;
 using ChaseGame.Input;
+using ChaseGame.Match;
 
 namespace ChaseGame.Infrastructure
 {
     public class GameLifetimeScope : LifetimeScope
     {
+        [SerializeField] private SpawnSettings spawnSettings;
+
         protected override void Configure(IContainerBuilder builder)
         {
             // The on-screen joystick adapter (a MonoBehaviour in the scene). Registered by
@@ -15,10 +19,16 @@ namespace ChaseGame.Infrastructure
 
             builder.Register<IInputService, InputSystemService>(Lifetime.Singleton);
 
-            // The single Character currently placed in the Game scene.
-            builder.RegisterComponentInHierarchy<Character>();
+            // Match services shared across every spawned character.
+            builder.RegisterInstance(spawnSettings);
+            builder.Register<ITeamRoster, TeamRoster>(Lifetime.Singleton);
+            builder.Register<ICaptureService, CaptureServiceStub>(Lifetime.Singleton);
+            builder.Register<CharacterFactory>(Lifetime.Singleton);
 
-            builder.RegisterEntryPoint<PlayerBootstrap>();
+            // The coordinator ticks (ITickable) and is injected into SpawnManager (AsSelf).
+            builder.RegisterEntryPoint<ChaserCoordinator>().AsSelf();
+
+            builder.RegisterEntryPoint<SpawnManager>();
         }
     }
 }

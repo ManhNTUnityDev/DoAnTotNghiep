@@ -13,10 +13,11 @@ GameObject:
   - component: {fileID: 1238742826830119803}
   - component: {fileID: 7294893955327729227}
   - component: {fileID: 7109174174086488097}
-  - component: {fileID: 8166276298149908485}
-  - component: {fileID: 1396938770175068628}
+  - component: {fileID: 2399256872916059156}
+  - component: {fileID: 169308035915412360}
+  - component: {fileID: 402037689856578724}
   m_Layer: 0
-  m_Name: ChaserCharacter
+  m_Name: RunnerCharacter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -88,7 +89,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32961680401628c4bafa912569570f32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  team: 0
+  team: 1
 --- !u!195 &7109174174086488097
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -111,7 +112,7 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &8166276298149908485
+--- !u!114 &2399256872916059156
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -120,16 +121,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 5063297722196815091}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be6c880d562f4b84b8c60f26c27a8771, type: 3}
+  m_Script: {fileID: 11500000, guid: 138d1a2f19948b64cbbb332284815cb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  range: 8
-  cooldown: 1
-  eyeHeight: 0.6
-  hitMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
---- !u!114 &1396938770175068628
+  multiplier: 1.6
+  duration: 3
+  cooldown: 6
+--- !u!114 &169308035915412360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5063297722196815091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab8b8db1a3a71074e9fd63652a050b1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cooldown: 8
+  lifetime: 4
+  distance: 5
+--- !u!114 &402037689856578724
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
