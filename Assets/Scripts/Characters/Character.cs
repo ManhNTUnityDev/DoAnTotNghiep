@@ -7,6 +7,7 @@ namespace ChaseGame.Characters
         [SerializeField] private Team team = Team.Chaser;
 
         private ICharacterMovement movement;
+        private ICharacterAbilities abilities;
         private CaptureState captureState = CaptureState.Free;
 
         public Team Team => team;
@@ -27,8 +28,9 @@ namespace ChaseGame.Characters
 
         private void Awake()
         {
-            // Resolve the sibling movement component if a test hasn't injected one.
+            // Resolve sibling Body components if a test hasn't injected them.
             movement ??= GetComponent<ICharacterMovement>();
+            abilities ??= GetComponent<ICharacterAbilities>();
         }
 
         public void Move(Vector3 direction)
@@ -56,6 +58,18 @@ namespace ChaseGame.Characters
             movement?.Stop();
         }
 
+        public void UseAbility(int id, Vector3 aim)
+        {
+            if (captureState == CaptureState.Jailed)
+            {
+                return;
+            }
+
+            abilities?.UseAbility(id, aim);
+        }
+
+        public bool IsAbilityReady(int id) => abilities != null && abilities.IsReady(id);
+
         // Test seam: inject a movement double without a CharacterController.
         public void SetMovementForTests(ICharacterMovement injected)
         {
@@ -66,6 +80,12 @@ namespace ChaseGame.Characters
         public void SetTeamForTests(Team value)
         {
             team = value;
+        }
+
+        // Test seam: inject an abilities double.
+        public void SetAbilitiesForTests(ICharacterAbilities injected)
+        {
+            abilities = injected;
         }
     }
 }
