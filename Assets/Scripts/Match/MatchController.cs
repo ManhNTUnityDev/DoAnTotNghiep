@@ -82,6 +82,7 @@ namespace ChaseGame.Match
 
         public void Quit()
         {
+            Time.timeScale = 1f; // don't leave a frozen clock for the next play session
 #if UNITY_EDITOR
             EditorApplication.isPlaying = false;
 #else
