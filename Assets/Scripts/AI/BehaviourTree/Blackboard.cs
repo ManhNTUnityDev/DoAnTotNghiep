@@ -14,5 +14,7 @@ namespace ChaseGame.AI.BehaviourTree
 
         public Transform CurrentTarget;  // chaser: nearest visible free runner
         public Transform NearestThreat;  // runner: nearest visible chaser
+
+        public Vector3? Destination;     // scratch for wander / flee targets
     }
 }
