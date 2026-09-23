@@ -74,9 +74,21 @@ namespace ChaseGame.AI
                 return;
             }
 
-            var candidates = CandidatesFor(bb.Self.Team, bb.Roster);
-            Vector3 eye = transform.position + Vector3.up * eyeHeight;
+            var candidates = new List<Candidate>(CandidatesFor(bb.Self.Team, bb.Roster));
 
+            // Chasers are also fooled by active decoy lures.
+            if (bb.Self.Team == Team.Chaser)
+            {
+                foreach (var lure in DecoyLure.Active)
+                {
+                    if (lure != null)
+                    {
+                        candidates.Add(new Candidate(lure.transform, lure.transform.position));
+                    }
+                }
+            }
+
+            Vector3 eye = transform.position + Vector3.up * eyeHeight;
             var target = NearestVisible(eye, candidates, bb.Config.VisionRadius, HasLineOfSight);
 
             if (bb.Self.Team == Team.Chaser)

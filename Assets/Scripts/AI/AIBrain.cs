@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 using ChaseGame.Brains;
 using ChaseGame.Characters;
 using ChaseGame.Match;
@@ -65,6 +66,46 @@ namespace ChaseGame.AI
         public void TickForTests()
         {
             root?.Tick(Blackboard);
+        }
+
+        // Shared roaming behaviour: keep heading to a random reachable point,
+        // picking a new one on arrival. Fails when there is no NavMesh nearby.
+        protected static NodeStatus Wander(Blackboard bb)
+        {
+            const float reach = 1.5f;
+            Vector3 self = bb.Self.transform.position;
+
+            bool needNew = bb.Destination == null ||
+                           Vector3.Distance(self, bb.Destination.Value) <= reach;
+
+            if (needNew)
+            {
+                float radius = bb.Config != null ? bb.Config.WanderRadius : 6f;
+                if (TryRandomPoint(self, radius, out var point))
+                {
+                    bb.Destination = point;
+                }
+                else
+                {
+                    return NodeStatus.Failure;
+                }
+            }
+
+            bb.Self.MoveTo(bb.Destination.Value);
+            return NodeStatus.Running;
+        }
+
+        protected static bool TryRandomPoint(Vector3 center, float radius, out Vector3 result)
+        {
+            Vector3 candidate = center + Random.insideUnitSphere * radius;
+            if (NavMesh.SamplePosition(candidate, out var hit, radius, NavMesh.AllAreas))
+            {
+                result = hit.position;
+                return true;
+            }
+
+            result = center;
+            return false;
         }
     }
 }

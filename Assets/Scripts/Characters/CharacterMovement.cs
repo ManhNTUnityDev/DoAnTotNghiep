@@ -14,6 +14,22 @@ namespace ChaseGame.Characters
         private NavMeshAgent agent;      // optional: present on AI-capable prefabs
         private Vector3 moveDirection;
         private Mode mode = Mode.Direction;
+        private float speedMultiplier = 1f;
+
+        public float SpeedMultiplier => speedMultiplier;
+
+        private float BaseSpeed => stats != null ? stats.MoveSpeed : 5f;
+
+        // Temporary speed scaling (e.g. SpeedBoost). Keeps agent.speed in sync so the
+        // path-steering desiredVelocity matches the body's actual speed.
+        public void SetSpeedMultiplier(float multiplier)
+        {
+            speedMultiplier = Mathf.Max(0f, multiplier);
+            if (agent != null)
+            {
+                agent.speed = BaseSpeed * speedMultiplier;
+            }
+        }
 
         public static Vector3 ComputeVelocity(Vector3 direction, float speed)
         {
@@ -55,7 +71,7 @@ namespace ChaseGame.Characters
                 // The agent only computes the path; the CharacterController does the moving.
                 agent.updatePosition = false;
                 agent.updateRotation = false;
-                agent.speed = stats != null ? stats.MoveSpeed : 5f;
+                agent.speed = BaseSpeed * speedMultiplier;
             }
         }
 
@@ -95,7 +111,7 @@ namespace ChaseGame.Characters
                     : DesiredToDirection(agent.desiredVelocity);
             }
 
-            float speed = stats != null ? stats.MoveSpeed : 5f;
+            float speed = BaseSpeed * speedMultiplier;
             Vector3 velocity = ComputeVelocity(moveDirection, speed);
             velocity += Physics.gravity; // simple gravity keeps the controller grounded
             controller.Move(velocity * Time.deltaTime);
