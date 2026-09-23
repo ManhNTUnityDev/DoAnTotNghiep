@@ -180,7 +180,7 @@ All game sub-namespaces (`Characters`, `Input`, `Brains`, `Infrastructure`, `AI`
 ## 9. Known follow-ups (deferred by design)
 
 - **Real JailSystem:** capture is a stub (`CaptureServiceStub` + `CageStub`) — no physical cage, and rescue is approach-only. Runners' `GoRescue` reaches a jailed teammate but does not free them yet.
-- **Match end + UI:** `AllRunnersJailed()` exists but there is no timer, win/lose screen, or restart. (Next planned slice.)
+- **Match end + UI:** ✅ **Implemented** — countdown, win/lose conditions, HUD, and end screen (BẠN THẮNG/THUA + Chơi lại/Thoát). See [Match End + UI](2026-09-23-match-end-and-ui.md).
 - **Movement balance ceiling:** on the open floor the Gun (range 8 + vision 12) is the real dominance driver, so speed-only tuning has a ceiling; deeper balance needs gun/vision changes or obstacle cover.
 - **Obstacle carving:** the map navmesh is an open floor (no buildings carved), so there is no cover for runners to break line-of-sight.
 - **Minor (from review):** `MoveTo()` lacks the `isOnNavMesh` guard `Stop()` has; per-tick perception allocations (new lists each `Sense`); vision measured from the raised eye (~0.3% short); an automated PlayMode test that boots the full DI scene (the 1P+7NPC match was verified by observed playtest, not an automated test).
