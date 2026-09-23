@@ -58,7 +58,7 @@ namespace ChaseGame.Match
                 hud.SetSpectating(player != null && player.CaptureState == CaptureState.Jailed);
             }
 
-            var next = evaluator.Evaluate(freeCount, timeRemaining);
+            var next = evaluator.Evaluate(freeCount, total, timeRemaining);
             if (next != MatchState.Ongoing) EndMatch(next);
         }
 
