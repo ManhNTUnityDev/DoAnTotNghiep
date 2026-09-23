@@ -25,6 +25,10 @@ namespace ChaseGame.Infrastructure
             builder.Register<ICaptureService, CaptureServiceStub>(Lifetime.Singleton);
             builder.Register<CharacterFactory>(Lifetime.Singleton);
 
+            // Match end-condition subsystem.
+            builder.Register<MatchEvaluator>(Lifetime.Singleton);
+            builder.RegisterComponentInHierarchy<MatchController>();
+
             // The coordinator ticks (ITickable) and is injected into SpawnManager (AsSelf).
             builder.RegisterEntryPoint<ChaserCoordinator>().AsSelf();
 
