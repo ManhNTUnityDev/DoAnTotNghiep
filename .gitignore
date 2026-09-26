@@ -18,3 +18,5 @@ Temp
 Game.slnx
 .vscode
 *.sln
+obj
+.idea
