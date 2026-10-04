@@ -1,0 +1,209 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: OnlyBlendShape
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: Character_Rig
+    m_Weight: 0
+  - m_Path: Character_Rig/IK_Switch
+    m_Weight: 0
+  - m_Path: Character_Rig/IK_Switch/IK_Switch_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Leg_L
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Leg_L/Leg.001_L
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Leg_L/Leg.001_L/Feet_L
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Leg_L/Leg.001_L/Feet_L/Feet.001_L
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Leg_L/Leg.001_L/Feet_L/Feet.001_L/Feet.001_L_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Leg_R
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Leg_R/Leg.001_R
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Leg_R/Leg.001_R/Feet_R
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Leg_R/Leg.001_R/Feet_R/Feet.001_R
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Leg_R/Leg.001_R/Feet_R/Feet.001_R/Feet.001_R_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/NSFW_L
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/NSFW_L/NSFW_L_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/NSFW_R
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/NSFW_R/NSFW_R_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Neck
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Neck/Head
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Neck/Head/Head_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Index_L
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Index_L/Index_L.001
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Index_L/Index_L.001/Index_L.002
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Index_L/Index_L.001/Index_L.002/Index_L.002_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Middle_L.003
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Middle_L.003/Middle_L.004
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Middle_L.003/Middle_L.004/Middle_L.005
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Middle_L.003/Middle_L.004/Middle_L.005/Middle_L.005_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Pinky_L.009
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Pinky_L.009/Pinky_L.010
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Pinky_L.009/Pinky_L.010/Pinky_L.011
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Pinky_L.009/Pinky_L.010/Pinky_L.011/Pinky_L.011_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Ring_L.006
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Ring_L.006/Ring_L.007
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Ring_L.006/Ring_L.007/Ring_L.008
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Ring_L.006/Ring_L.007/Ring_L.008/Ring_L.008_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Thumb_L.003
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Thumb_L.003/Thumb_L.004
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Thumb_L.003/Thumb_L.004/Thumb_L.005
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_L/Arm_L/Arm_L.001/Hand_L/Thumb_L.003/Thumb_L.004/Thumb_L.005/Thumb_L.005_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Index_R
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Index_R/Index_R.001
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Index_R/Index_R.001/Index_R.002
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Index_R/Index_R.001/Index_R.002/Index_R.002_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Middle_R.003
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Middle_R.003/Middle_R.004
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Middle_R.003/Middle_R.004/Middle_R.005
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Middle_R.003/Middle_R.004/Middle_R.005/Middle_R.005_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Pinky_R.009
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Pinky_R.009/Pinky_R.010
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Pinky_R.009/Pinky_R.010/Pinky_R.011
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Pinky_R.009/Pinky_R.010/Pinky_R.011/Pinky_R.011_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Ring_R.006
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Ring_R.006/Ring_R.007
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Ring_R.006/Ring_R.007/Ring_R.008
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Ring_R.006/Ring_R.007/Ring_R.008/Ring_R.008_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Thumb_R.003
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Thumb_R.003/Thumb_R.004
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Thumb_R.003/Thumb_R.004/Thumb_R.005
+    m_Weight: 0
+  - m_Path: Character_Rig/World/Hip/Spine/Spine.001/Spine.002/Spine.003/Shoulder_R/Arm_R/Arm_R.001/Hand_R/Thumb_R.003/Thumb_R.004/Thumb_R.005/Thumb_R.005_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/IK_Feet_L
+    m_Weight: 0
+  - m_Path: Character_Rig/World/IK_Feet_L/Pole_Leg_L
+    m_Weight: 0
+  - m_Path: Character_Rig/World/IK_Feet_L/Pole_Leg_L/Pole_Leg_L_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/IK_Feet_R
+    m_Weight: 0
+  - m_Path: Character_Rig/World/IK_Feet_R/Pole_Leg_R
+    m_Weight: 0
+  - m_Path: Character_Rig/World/IK_Feet_R/Pole_Leg_R/Pole_Leg_R_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/IK_Hand_L
+    m_Weight: 0
+  - m_Path: Character_Rig/World/IK_Hand_L/Pole_Arm_L
+    m_Weight: 0
+  - m_Path: Character_Rig/World/IK_Hand_L/Pole_Arm_L/Pole_Arm_L_end
+    m_Weight: 0
+  - m_Path: Character_Rig/World/IK_Hand_R
+    m_Weight: 0
+  - m_Path: Character_Rig/World/IK_Hand_R/Pole_Arm_R
+    m_Weight: 0
+  - m_Path: Character_Rig/World/IK_Hand_R/Pole_Arm_R/Pole_Arm_R_end
+    m_Weight: 0
+  - m_Path: Men_1
+    m_Weight: 1
+  - m_Path: Men_2
+    m_Weight: 1
+  - m_Path: Men_03
+    m_Weight: 1
+  - m_Path: Men_04
+    m_Weight: 1
+  - m_Path: Men_05
+    m_Weight: 1
+  - m_Path: Men_06
+    m_Weight: 1
+  - m_Path: Police
+    m_Weight: 1
+  - m_Path: Security
+    m_Weight: 1
+  - m_Path: Woman_1
+    m_Weight: 1
+  - m_Path: Woman_3
+    m_Weight: 1
+  - m_Path: Woman_4
+    m_Weight: 1
+  - m_Path: Women_2_T
+    m_Weight: 1
