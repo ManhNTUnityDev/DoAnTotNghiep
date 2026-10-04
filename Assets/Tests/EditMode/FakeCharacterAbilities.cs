@@ -10,8 +10,14 @@ namespace ChaseGame.Tests
         public readonly List<int> Used = new List<int>();
         public readonly HashSet<int> ReadyIds = new HashSet<int> { 0, 1 };
 
+        public event System.Action<int> OnAbilityUsed;
+
         public bool IsReady(int id) => ReadyIds.Contains(id);
 
-        public void UseAbility(int id, Vector3 aim) => Used.Add(id);
+        public void UseAbility(int id, Vector3 aim)
+        {
+            Used.Add(id);
+            OnAbilityUsed?.Invoke(id);
+        }
     }
 }

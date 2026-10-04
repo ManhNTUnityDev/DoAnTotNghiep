@@ -9,6 +9,7 @@ namespace ChaseGame.Abilities
     {
         private IAbility[] abilities;
         private Character character;
+        public event System.Action<int> OnAbilityUsed;
 
         private void Awake()
         {
@@ -30,6 +31,7 @@ namespace ChaseGame.Abilities
             if (ability.IsReady)
             {
                 ability.Use(character, aim);
+                OnAbilityUsed?.Invoke(id);
             }
         }
     }

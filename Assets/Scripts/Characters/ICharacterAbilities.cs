@@ -8,5 +8,6 @@ namespace ChaseGame.Characters
     {
         bool IsReady(int id);
         void UseAbility(int id, Vector3 aim);
+        event System.Action<int> OnAbilityUsed;
     }
 }
