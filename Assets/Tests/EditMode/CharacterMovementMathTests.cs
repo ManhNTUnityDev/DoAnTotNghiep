@@ -65,5 +65,21 @@ namespace ChaseGame.Tests
             Assert.IsFalse(CharacterMovement.ShouldStopAtDestination(
                 pathPending: true, remainingDistance: 0f, stoppingDistance: 0.25f));
         }
+
+        [Test]
+        public void ComputeNextRotation_TurnsTowardMovementDirection()
+        {
+            var initial = Quaternion.LookRotation(Vector3.forward);
+            var rotated = CharacterMovement.ComputeNextRotation(initial, Vector3.right, 540f, 0.2f);
+            float angleToRight = Quaternion.Angle(rotated, Quaternion.LookRotation(Vector3.right));
+            Assert.Less(angleToRight, 1f, "540 deg/s over 0.2s (108 deg) should complete a 90 deg turn");
+        }
+
+        [Test]
+        public void SmoothDirection_ZeroTarget_StopsImmediately()
+        {
+            var result = CharacterMovement.SmoothDirection(Vector3.forward, Vector3.zero, 16f, 0.016f);
+            Assert.AreEqual(Vector3.zero, result);
+        }
     }
 }

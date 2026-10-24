@@ -97,5 +97,27 @@ namespace ChaseGame.Tests
 
             Assert.AreEqual(0, spy.MoveToCallCount);
         }
+
+        [Test]
+        public void WhenTargetLost_ContinuesToLastKnownTargetPosition_InsteadOfOldWanderPoint()
+        {
+            var (ch, spy, brain) = MakeChaser();
+            var target = new GameObject("Runner");
+            spawned.Add(target);
+            target.transform.position = new Vector3(6f, 0f, 4f);
+
+            // Pre-existing wander destination in the opposite direction
+            brain.Blackboard.Destination = new Vector3(-10f, 0f, -10f);
+
+            // Tick 1: sees target and chases it
+            brain.Blackboard.CurrentTarget = target.transform;
+            brain.TickForTests();
+            Assert.AreEqual(new Vector3(6f, 0f, 4f), spy.LastDestination);
+
+            // Tick 2: loses sight of target -> continues to last known position (6, 0, 4), NOT (-10, 0, -10)
+            brain.Blackboard.CurrentTarget = null;
+            brain.TickForTests();
+            Assert.AreEqual(new Vector3(6f, 0f, 4f), spy.LastDestination);
+        }
     }
 }

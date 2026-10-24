@@ -9,10 +9,14 @@ namespace ChaseGame.Characters
         private enum Mode { Direction, Agent }
 
         [SerializeField] private CharacterStats stats;
+        [SerializeField] private float turnSpeed = 540f;
+        [SerializeField] private float steeringSmoothRate = 16f;
 
         private CharacterController controller;
         private NavMeshAgent agent;      // optional: present on AI-capable prefabs
         private Vector3 moveDirection;
+        private Vector3 lastDestination;
+        private bool hasDestination;
         private Mode mode = Mode.Direction;
         private float speedMultiplier = 1f;
 
@@ -53,6 +57,41 @@ namespace ChaseGame.Characters
             return desiredVelocity.normalized;
         }
 
+        // Smooths high-frequency RVO avoidance direction changes while stopping
+        // immediately when targetDirection is zero.
+        public static Vector3 SmoothDirection(Vector3 currentDirection, Vector3 targetDirection, float smoothRate, float deltaTime)
+        {
+            if (targetDirection.sqrMagnitude < 1e-6f)
+            {
+                return Vector3.zero;
+            }
+
+            if (currentDirection.sqrMagnitude < 1e-6f || deltaTime <= 0f)
+            {
+                return targetDirection.normalized;
+            }
+
+            float t = Mathf.Clamp01(smoothRate * deltaTime);
+            return Vector3.Slerp(currentDirection.normalized, targetDirection.normalized, t).normalized;
+        }
+
+        // Smoothly turns the character on the horizontal plane toward its movement direction.
+        public static Quaternion ComputeNextRotation(
+            Quaternion currentRotation,
+            Vector3 direction,
+            float turnSpeedDegPerSec,
+            float deltaTime)
+        {
+            Vector3 planar = new Vector3(direction.x, 0f, direction.z);
+            if (planar.sqrMagnitude < 1e-4f || deltaTime <= 0f)
+            {
+                return currentRotation;
+            }
+
+            Quaternion targetRotation = Quaternion.LookRotation(planar.normalized, Vector3.up);
+            return Quaternion.RotateTowards(currentRotation, targetRotation, turnSpeedDegPerSec * deltaTime);
+        }
+
         // Because the body is driven at full speed (magnitude is discarded), the
         // near-zero desiredVelocity clamp alone can let the controller overshoot the
         // destination and oscillate. Once the path is resolved and we are within the
@@ -78,6 +117,7 @@ namespace ChaseGame.Characters
         public void SetMoveDirection(Vector3 direction)
         {
             mode = Mode.Direction;
+            hasDestination = false;
             moveDirection = direction;
         }
 
@@ -89,12 +129,24 @@ namespace ChaseGame.Characters
             }
 
             mode = Mode.Agent;
+
+            // Avoid resetting the NavMesh path 8 times/sec when destination hasn't meaningfully changed.
+            if (hasDestination &&
+                (agent.hasPath || agent.pathPending) &&
+                (destination - lastDestination).sqrMagnitude < 0.0225f)
+            {
+                return;
+            }
+
+            lastDestination = destination;
+            hasDestination = true;
             agent.SetDestination(destination);
         }
 
         public void Stop()
         {
             mode = Mode.Direction;
+            hasDestination = false;
             moveDirection = Vector3.zero;
             if (agent != null && agent.isOnNavMesh)
             {
@@ -104,14 +156,23 @@ namespace ChaseGame.Characters
 
         private void Update()
         {
+            float speed = BaseSpeed * speedMultiplier;
+
             if (mode == Mode.Agent && agent != null)
             {
-                moveDirection = ShouldStopAtDestination(agent.pathPending, agent.remainingDistance, agent.stoppingDistance)
+                agent.speed = speed;
+                Vector3 rawDirection = ShouldStopAtDestination(agent.pathPending, agent.remainingDistance, agent.stoppingDistance)
                     ? Vector3.zero
                     : DesiredToDirection(agent.desiredVelocity);
+
+                moveDirection = SmoothDirection(moveDirection, rawDirection, steeringSmoothRate, Time.deltaTime);
             }
 
-            float speed = BaseSpeed * speedMultiplier;
+            if (moveDirection.sqrMagnitude > 1e-4f)
+            {
+                transform.rotation = ComputeNextRotation(transform.rotation, moveDirection, turnSpeed, Time.deltaTime);
+            }
+
             Vector3 velocity = ComputeVelocity(moveDirection, speed);
             velocity += Physics.gravity; // simple gravity keeps the controller grounded
             controller.Move(velocity * Time.deltaTime);

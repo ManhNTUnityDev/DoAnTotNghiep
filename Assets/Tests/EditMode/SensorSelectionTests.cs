@@ -128,5 +128,21 @@ namespace ChaseGame.Tests
             Assert.AreEqual(1, cands.Count);
             Assert.AreSame(chaser.transform, cands[0].Transform);
         }
+
+        [Test]
+        public void NearestVisible_WithCurrentSelection_KeepsCurrentWhenOtherIsOnlySlightlyCloser()
+        {
+            var from = Vector3.zero;
+            var current = NewAt(new Vector3(5.0f, 0f, 0f));
+            var slightlyCloser = NewAt(new Vector3(4.6f, 0f, 0f));
+            var cands = new List<Sensor.Candidate>
+            {
+                new Sensor.Candidate(current, current.position),
+                new Sensor.Candidate(slightlyCloser, slightlyCloser.position),
+            };
+
+            var picked = Sensor.NearestVisible(from, cands, radius: 10f, hasLineOfSight: (_, __) => true, currentSelection: current);
+            Assert.AreSame(current, picked, "stickiness bias should prevent flip-flopping between nearly equidistant targets");
+        }
     }
 }

@@ -36,27 +36,39 @@ namespace ChaseGame.AI
             float range = bb.Config != null ? bb.Config.ShootRange : 8f;
             Vector3 a = bb.Self.transform.position;
             Vector3 b = bb.CurrentTarget.position;
-            float planar = Vector2.Distance(new Vector2(a.x, a.z), new Vector2(b.x, b.z));
+            float planar = PlanarDistance(a, b);
+
             return planar <= range && bb.Self.IsAbilityReady(0);
         }
 
         private static NodeStatus AimAndShoot(Blackboard bb)
         {
-            Vector3 dir = bb.CurrentTarget.position - bb.Self.transform.position;
+            Vector3 targetPos = bb.CurrentTarget.position;
+            Vector3 dir = targetPos - bb.Self.transform.position;
             dir.y = 0f;
             Vector3 aim = dir.sqrMagnitude > 1e-4f ? dir.normalized : bb.Self.transform.forward;
+
+            // Keep pursuing and remember last known position while firing.
+            bb.Destination = targetPos;
+            bb.Self.MoveTo(targetPos);
             bb.Self.UseAbility(0, aim);
             return NodeStatus.Success;
         }
 
         private static NodeStatus ChaseTarget(Blackboard bb)
         {
-            bb.Self.MoveTo(bb.CurrentTarget.position);
+            Vector3 targetPos = bb.CurrentTarget.position;
+            // Store target position in Destination so if sight is lost next tick,
+            // Wander smoothly finishes walking to the runner's last seen position
+            // instead of snapping 180° back to a stale pre-chase wander point.
+            bb.Destination = targetPos;
+            bb.Self.MoveTo(targetPos);
             return NodeStatus.Running;
         }
 
         private static NodeStatus GuardCage(Blackboard bb)
         {
+            bb.Destination = null;
             bb.Self.MoveTo(bb.GuardPost.Value);
             return NodeStatus.Running;
         }

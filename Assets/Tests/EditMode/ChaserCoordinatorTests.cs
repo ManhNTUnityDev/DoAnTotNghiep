@@ -98,5 +98,24 @@ namespace ChaseGame.Tests
             var a = ChaserAt(Vector3.zero);
             Assert.DoesNotThrow(() => ChaserCoordinator.Assign(new List<Blackboard> { a }, null));
         }
+
+        [Test]
+        public void Assign_PrefersIdleChaserOverChaserActivelyHunting()
+        {
+            var huntingNear = ChaserAt(new Vector3(1f, 0f, 0f));
+            var dummyRunner = new GameObject("Runner");
+            spawned.Add(dummyRunner);
+            huntingNear.CurrentTarget = dummyRunner.transform;
+
+            var idleFarther = ChaserAt(new Vector3(5f, 0f, 0f));
+            var cage = CageAt(new Vector3(0f, 0f, 0f));
+
+            ChaserCoordinator.Assign(
+                new List<Blackboard> { huntingNear, idleFarther },
+                new List<CageStub> { cage });
+
+            Assert.IsFalse(huntingNear.GuardPost.HasValue, "chaser actively hunting should not be pulled into guard duty when an idle chaser is available");
+            Assert.AreEqual(cage.Position, idleFarther.GuardPost);
+        }
     }
 }

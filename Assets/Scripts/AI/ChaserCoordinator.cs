@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using VContainer.Unity;
 using ChaseGame.Match;
 using ChaseGame.AI.BehaviourTree;
+using UnityEngine;
 
 namespace ChaseGame.AI
 {
@@ -35,8 +36,13 @@ namespace ChaseGame.AI
             Assign(chasers, capture?.ActiveCages);
         }
 
-        // Pure: one guard per cage, the nearest not-yet-claimed chaser. Everyone else is
-        // cleared (free to hunt/wander). Safe with null/empty inputs.
+        // Hysteresis factor (0.8^2 = 0.64) so an already-assigned guard doesn't swap
+        // roles every frame with another chaser at nearly the same distance.
+        private const float ExistingGuardSqrBias = 0.64f;
+
+        // Pure: one guard per cage, preferring the nearest not-yet-claimed chaser that
+        // is not actively chasing a runner (falling back to any unclaimed chaser if all
+        // are busy). Everyone else is cleared (free to hunt/wander).
         public static void Assign(IReadOnlyList<Blackboard> chasers, IReadOnlyList<CageStub> cages)
         {
             if (chasers == null)
@@ -44,9 +50,14 @@ namespace ChaseGame.AI
                 return;
             }
 
+            var previousPosts = new Dictionary<Blackboard, Vector3?>(chasers.Count);
             foreach (var c in chasers)
             {
-                c.GuardPost = null;
+                if (c != null)
+                {
+                    previousPosts[c] = c.GuardPost;
+                    c.GuardPost = null;
+                }
             }
 
             if (cages == null || cages.Count == 0)
@@ -57,22 +68,8 @@ namespace ChaseGame.AI
             var claimed = new HashSet<Blackboard>();
             foreach (var cage in cages)
             {
-                Blackboard best = null;
-                float bestSqr = float.MaxValue;
-                foreach (var c in chasers)
-                {
-                    if (c.Self == null || claimed.Contains(c))
-                    {
-                        continue;
-                    }
-
-                    float sqr = (c.Self.transform.position - cage.Position).sqrMagnitude;
-                    if (sqr < bestSqr)
-                    {
-                        bestSqr = sqr;
-                        best = c;
-                    }
-                }
+                Blackboard best = FindBestCandidate(chasers, cage.Position, claimed, previousPosts, onlyIdle: true)
+                               ?? FindBestCandidate(chasers, cage.Position, claimed, previousPosts, onlyIdle: false);
 
                 if (best != null)
                 {
@@ -80,6 +77,46 @@ namespace ChaseGame.AI
                     claimed.Add(best);
                 }
             }
+        }
+
+        private static Blackboard FindBestCandidate(
+            IReadOnlyList<Blackboard> chasers,
+            Vector3 cagePos,
+            HashSet<Blackboard> claimed,
+            Dictionary<Blackboard, Vector3?> previousPosts,
+            bool onlyIdle)
+        {
+            Blackboard best = null;
+            float bestScore = float.MaxValue;
+
+            foreach (var c in chasers)
+            {
+                if (c?.Self == null || claimed.Contains(c))
+                {
+                    continue;
+                }
+
+                if (onlyIdle && c.CurrentTarget != null)
+                {
+                    continue;
+                }
+
+                float sqr = (c.Self.transform.position - cagePos).sqrMagnitude;
+                if (previousPosts.TryGetValue(c, out var prev) &&
+                    prev.HasValue &&
+                    (prev.Value - cagePos).sqrMagnitude < 0.04f)
+                {
+                    sqr *= ExistingGuardSqrBias;
+                }
+
+                if (sqr < bestScore)
+                {
+                    bestScore = sqr;
+                    best = c;
+                }
+            }
+
+            return best;
         }
     }
 }

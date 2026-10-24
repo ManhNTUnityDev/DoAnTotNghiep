@@ -11,8 +11,11 @@ namespace ChaseGame.AI
     // and writes it to the blackboard. Ticked by the brain (not every frame).
     public class Sensor : MonoBehaviour
     {
-        [SerializeField] private LayerMask obstacleMask;
-        [SerializeField] private float eyeHeight = 1f;
+        [SerializeField] private LayerMask obstacleMask = ~0;
+        [SerializeField] private float eyeHeight = 0.6f;
+
+        private const float StickinessSqrBias = 0.64f;
+        private const float RetainRadiusMultiplier = 1.15f;
 
         public readonly struct Candidate
         {
@@ -44,13 +47,34 @@ namespace ChaseGame.AI
             float radius,
             Func<Vector3, Vector3, bool> hasLineOfSight)
         {
+            return NearestVisible(from, candidates, radius, hasLineOfSight, currentSelection: null);
+        }
+
+        public static Transform NearestVisible(
+            Vector3 from,
+            IReadOnlyList<Candidate> candidates,
+            float radius,
+            Func<Vector3, Vector3, bool> hasLineOfSight,
+            Transform currentSelection)
+        {
             Transform best = null;
-            float bestSqr = radius * radius;
+            float baseMaxSqr = radius * radius;
+            float retainMaxSqr = (radius * RetainRadiusMultiplier) * (radius * RetainRadiusMultiplier);
+            float bestScoreSqr = float.MaxValue;
 
             foreach (var cand in candidates)
             {
+                bool isCurrent = currentSelection != null && cand.Transform == currentSelection;
+                float allowedMaxSqr = isCurrent ? retainMaxSqr : baseMaxSqr;
+
                 float sqr = (cand.Position - from).sqrMagnitude;
-                if (sqr > bestSqr)
+                if (sqr > allowedMaxSqr)
+                {
+                    continue;
+                }
+
+                float scoreSqr = isCurrent ? sqr * StickinessSqrBias : sqr;
+                if (scoreSqr >= bestScoreSqr)
                 {
                     continue;
                 }
@@ -60,7 +84,7 @@ namespace ChaseGame.AI
                     continue;
                 }
 
-                bestSqr = sqr;
+                bestScoreSqr = scoreSqr;
                 best = cand.Transform;
             }
 
@@ -89,7 +113,8 @@ namespace ChaseGame.AI
             }
 
             Vector3 eye = transform.position + Vector3.up * eyeHeight;
-            var target = NearestVisible(eye, candidates, bb.Config.VisionRadius, HasLineOfSight);
+            Transform previous = bb.Self.Team == Team.Chaser ? bb.CurrentTarget : bb.NearestThreat;
+            var target = NearestVisible(eye, candidates, bb.Config.VisionRadius, HasLineOfSight, previous);
 
             if (bb.Self.Team == Team.Chaser)
             {
@@ -104,8 +129,36 @@ namespace ChaseGame.AI
         private bool HasLineOfSight(Vector3 from, Vector3 targetPos)
         {
             Vector3 to = (targetPos + Vector3.up * eyeHeight) - from;
-            // Blocked if an obstacle sits between the eye and the target.
-            return !Physics.Raycast(from, to.normalized, to.magnitude, obstacleMask);
+            float dist = to.magnitude;
+            const float bodyClearance = 0.45f;
+
+            if (dist <= bodyClearance * 2f)
+            {
+                return true;
+            }
+
+            Vector3 dir = to / dist;
+            int mask = obstacleMask.value != 0 ? obstacleMask.value : ~0;
+
+            if (Physics.Raycast(
+                from + dir * bodyClearance,
+                dir,
+                out var hit,
+                dist - bodyClearance * 2f,
+                mask,
+                QueryTriggerInteraction.Ignore))
+            {
+                // Ignore characters and decoy lures so only actual map geometry blocks sight.
+                if (hit.collider.GetComponentInParent<Character>() != null ||
+                    hit.collider.GetComponentInParent<DecoyLure>() != null)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+            return true;
         }
     }
 }

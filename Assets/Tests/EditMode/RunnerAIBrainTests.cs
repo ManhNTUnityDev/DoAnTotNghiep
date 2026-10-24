@@ -88,5 +88,54 @@ namespace ChaseGame.Tests
             Assert.GreaterOrEqual(spy.MoveToCallCount, 1);
             Assert.AreEqual(new Vector3(7f, 0f, 2f), spy.LastDestination);
         }
+
+        [Test]
+        public void ThreatNear_AppliesHysteresis_DoesNotDropFleeJustOutsideBaseRadius()
+        {
+            var (ch, spy, abilities, brain) = MakeRunner();
+            var threat = new GameObject("Chaser");
+            spawned.Add(threat);
+
+            // Step 1: Threat inside 6m triggers fleeing and clears stale wander destination.
+            brain.Blackboard.Destination = new Vector3(10f, 0f, 0f);
+            threat.transform.position = new Vector3(5.8f, 0f, 0f);
+            brain.Blackboard.NearestThreat = threat.transform;
+            brain.TickForTests();
+
+            Assert.IsTrue(brain.Blackboard.IsFleeing);
+            Assert.IsNull(brain.Blackboard.Destination, "fleeing must clear stale wander destination");
+
+            // Step 2: Threat at 6.5m (just outside 6m base radius, inside 8.1m exit radius) keeps fleeing.
+            threat.transform.position = new Vector3(6.5f, 0f, 0f);
+            Assert.IsTrue(RunnerAIBrain.ThreatNear(brain.Blackboard));
+
+            // Step 3: Threat at 8.5m (beyond hysteresis exit radius) stops fleeing.
+            threat.transform.position = new Vector3(8.5f, 0f, 0f);
+            Assert.IsFalse(RunnerAIBrain.ThreatNear(brain.Blackboard));
+        }
+
+        [Test]
+        public void WhenJailedTeammateIsGuardedByChaser_DoesNotSuicidallyRushCage()
+        {
+            var (ch, spy, abilities, brain) = MakeRunner();
+            var roster = (TeamRoster)brain.Blackboard.Roster;
+
+            var jailed = new GameObject("Jailed");
+            spawned.Add(jailed);
+            jailed.transform.position = new Vector3(10f, 0f, 0f);
+            var jailedCh = jailed.AddComponent<Character>();
+            jailedCh.SetTeamForTests(Team.Runner);
+            jailedCh.CaptureState = CaptureState.Jailed;
+            roster.Add(jailedCh);
+
+            var guard = new GameObject("GuardChaser");
+            spawned.Add(guard);
+            guard.transform.position = new Vector3(9f, 0f, 0f); // 1m from cage (within 5m RescueThreatRadius)
+            var guardCh = guard.AddComponent<Character>();
+            guardCh.SetTeamForTests(Team.Chaser);
+            roster.Add(guardCh);
+
+            Assert.IsFalse(RunnerAIBrain.HasJailedTeammate(brain.Blackboard));
+        }
     }
 }
