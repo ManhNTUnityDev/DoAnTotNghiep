@@ -71,7 +71,8 @@ namespace ChaseGame.Infrastructure
                 if (isPlayer)
                 {
                     var brain = character.gameObject.AddComponent<PlayerBrain>();
-                    brain.Initialize(character, input);
+                    Transform camTransform = settings.followCamera != null ? settings.followCamera.transform : null;
+                    brain.Initialize(character, input, camTransform);
                     roster.PlayerCharacter = character;
                 }
                 else
