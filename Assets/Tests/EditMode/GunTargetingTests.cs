@@ -42,5 +42,14 @@ namespace ChaseGame.Tests
         [Test]
         public void IsCapturable_Null_False()
             => Assert.IsFalse(Gun.IsCapturable(null));
+
+        [Test]
+        public void IsCapturable_RunnerWithDecoyLure_False()
+        {
+            var clone = NewChar(Team.Runner, CaptureState.Free);
+            clone.gameObject.AddComponent<ChaseGame.AI.DecoyLure>();
+
+            Assert.IsFalse(Gun.IsCapturable(clone), "A decoy clone must never be capturable into a cage");
+        }
     }
 }

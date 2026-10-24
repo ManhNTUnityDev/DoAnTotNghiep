@@ -137,5 +137,88 @@ namespace ChaseGame.Tests
 
             Assert.IsFalse(RunnerAIBrain.HasJailedTeammate(brain.Blackboard));
         }
+
+        [Test]
+        public void CloneRunner_WhenThreatNear_FleesWithoutUsingSkillsAndDivergesDirection()
+        {
+            var (ch, spy, abilities, brain) = MakeRunner();
+            brain.ConfigureAsClone(Vector3.forward, fleeAngleBias: 60f);
+            int callsBefore = spy.MoveToCallCount;
+
+            var threat = new GameObject("Chaser");
+            spawned.Add(threat);
+            threat.transform.position = new Vector3(3f, 0f, 0f); // threat to +x, direct away is -x (0, 0)
+
+            brain.Blackboard.NearestThreat = threat.transform;
+            brain.TickForTests();
+
+            Assert.AreEqual(0, abilities.Used.Count, "Clone runner must never use SpeedBoost or Decoy");
+            Assert.Greater(spy.MoveToCallCount, callsBefore);
+            // With +60 deg bias from (-1, 0, 0), the flee target should have a non-zero z component.
+            Assert.Greater(Mathf.Abs(spy.LastDestination.z), 0.5f, "Clone should diverge at an angle from the direct away vector");
+        }
+
+        [Test]
+        public void CloneRunner_NeverAttemptsToRescueJailedTeammate()
+        {
+            var (ch, spy, abilities, brain) = MakeRunner();
+            brain.ConfigureAsClone(Vector3.forward);
+
+            var roster = (TeamRoster)brain.Blackboard.Roster;
+            var jailed = new GameObject("Jailed");
+            spawned.Add(jailed);
+            jailed.transform.position = new Vector3(7f, 0f, 2f);
+            var jailedCh = jailed.AddComponent<Character>();
+            jailedCh.SetTeamForTests(Team.Runner);
+            jailedCh.CaptureState = CaptureState.Jailed;
+            roster.Add(jailedCh);
+
+            Assert.IsFalse(RunnerAIBrain.HasJailedTeammate(brain.Blackboard), "Clone runner must ignore jailed teammates");
+        }
+
+        [Test]
+        public void DecoyUse_SpawnsCloneAtRunnerPosition_StripsSkillsAndRegistersDecoyLure()
+        {
+            var roster = new TeamRoster();
+            var runnerGo = new GameObject("OriginalRunner");
+            spawned.Add(runnerGo);
+            runnerGo.transform.position = new Vector3(4f, 0f, -2f);
+
+            var runner = runnerGo.AddComponent<Character>();
+            runner.SetTeamForTests(Team.Runner);
+            roster.Add(runner);
+
+            runnerGo.AddComponent<ChaseGame.Abilities.SpeedBoost>();
+            var decoy = runnerGo.AddComponent<ChaseGame.Abilities.Decoy>();
+            decoy.Configure(roster, config);
+
+            decoy.Use(runner, Vector3.forward);
+
+            Assert.IsTrue(decoy.IsCloneActive);
+            Assert.IsNotNull(decoy.ActiveClone);
+            spawned.Add(decoy.ActiveClone.gameObject);
+
+            // 1. Spawned right at the caster's position
+            Assert.AreEqual(runnerGo.transform.position, decoy.ActiveClone.transform.position);
+
+            // 2. Registered in DecoyLure.Active, NOT in TeamRoster.Runners
+            CollectionAssert.Contains(DecoyLure.Active, decoy.ActiveClone);
+            Assert.AreEqual(1, roster.Runners.Count, "Clone must not be added to TeamRoster.Runners");
+
+            // 3. Has RunnerAIBrain in clone mode, and cannot use abilities or be captured
+            var cloneBrain = decoy.ActiveClone.GetComponent<RunnerAIBrain>();
+            Assert.IsNotNull(cloneBrain);
+            Assert.IsTrue(cloneBrain.IsClone);
+
+            var cloneChar = decoy.ActiveClone.GetComponent<Character>();
+            Assert.IsNotNull(cloneChar);
+            Assert.IsFalse(cloneChar.IsAbilityReady(0));
+            Assert.IsFalse(cloneChar.IsAbilityReady(1));
+            Assert.IsFalse(ChaseGame.Abilities.Gun.IsCapturable(cloneChar));
+
+            // 4. Dismiss immediately removes and destroys the clone
+            decoy.ActiveClone.Dismiss();
+            Assert.IsFalse(decoy.IsCloneActive);
+        }
     }
 }

@@ -140,8 +140,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cooldown: 8
-  lifetime: 4
-  distance: 5
+  lifetime: 3
+  divergenceAngle: 55
 --- !u!114 &402037689856578724
 MonoBehaviour:
   m_ObjectHideFlags: 0

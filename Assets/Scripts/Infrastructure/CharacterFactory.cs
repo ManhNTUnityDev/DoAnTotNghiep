@@ -29,6 +29,11 @@ namespace ChaseGame.Infrastructure
                 gun.Configure(capture);
             }
 
+            foreach (var decoy in instance.GetComponents<Decoy>())
+            {
+                decoy.Configure(roster, null);
+            }
+
             return instance;
         }
     }

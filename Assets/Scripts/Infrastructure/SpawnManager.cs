@@ -67,6 +67,11 @@ namespace ChaseGame.Infrastructure
 
                 var character = factory.Spawn(prefab, point.position, point.rotation);
 
+                foreach (var decoy in character.GetComponents<Abilities.Decoy>())
+                {
+                    decoy.Configure(roster, settings.aiConfig);
+                }
+
                 bool isPlayer = team == playerTeam && i == 0;
                 if (isPlayer)
                 {

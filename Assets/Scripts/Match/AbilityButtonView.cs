@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using ChaseGame.Abilities;
+using ChaseGame.AI;
 using ChaseGame.Brains;
 using ChaseGame.Characters;
 
@@ -257,10 +258,19 @@ namespace ChaseGame.Match
 
                 if (enableChaserAimAssist && roster != null)
                 {
+                    var targets = new List<Character>(roster.GetFreeRunners());
+                    foreach (var lure in DecoyLure.Active)
+                    {
+                        if (lure != null && lure.Character != null)
+                        {
+                            targets.Add(lure.Character);
+                        }
+                    }
+
                     return ComputeChaserAimDirection(
                         player.transform.position,
                         referenceForward,
-                        roster.GetFreeRunners(),
+                        targets,
                         aimAssistRange,
                         aimAssistAngle);
                 }
@@ -357,8 +367,9 @@ namespace ChaseGame.Match
 
             if (activeBuffIndicator != null && playerAbilities != null)
             {
-                var speedBoost = playerAbilities.GetAbility(abilityIndex) as SpeedBoost;
-                bool active = speedBoost != null && speedBoost.IsBoostActive;
+                var ability = playerAbilities.GetAbility(abilityIndex);
+                bool active = (ability is SpeedBoost sb && sb.IsBoostActive)
+                           || (ability is Decoy dec && dec.IsCloneActive);
                 if (activeBuffIndicator.activeSelf != active)
                 {
                     activeBuffIndicator.SetActive(active);

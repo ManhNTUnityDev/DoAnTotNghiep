@@ -12,6 +12,46 @@ namespace ChaseGame.AI
         private const float FleeExitMultiplier = 1.35f;
         private static readonly float[] FleeCandidateAngles = { 0f, 40f, -40f, 80f, -80f, 120f, -120f };
 
+        public bool IsClone => Blackboard != null && Blackboard.IsClone;
+
+        public void ConfigureAsClone(Vector3 initialMoveDirection, float fleeAngleBias = 50f)
+        {
+            if (Blackboard == null)
+            {
+                return;
+            }
+
+            Blackboard.IsClone = true;
+            Blackboard.CloneFleeAngleBias = fleeAngleBias;
+
+            if (Blackboard.Self == null)
+            {
+                return;
+            }
+
+            Vector3 selfPos = Blackboard.Self.transform.position;
+            float wanderRadius = Blackboard.Config != null ? Blackboard.Config.WanderRadius : 6f;
+            Vector3 flatDir = new Vector3(initialMoveDirection.x, 0f, initialMoveDirection.z);
+            if (flatDir.sqrMagnitude < 1e-4f)
+            {
+                flatDir = Blackboard.Self.transform.forward;
+            }
+            flatDir.Normalize();
+
+            Vector3 candidate = selfPos + flatDir * wanderRadius;
+            if (NavMesh.SamplePosition(candidate, out var hit, 3f, NavMesh.AllAreas) &&
+                PlanarDistance(selfPos, hit.position) >= 1f)
+            {
+                Blackboard.Destination = hit.position;
+                Blackboard.Self.MoveTo(hit.position);
+            }
+            else if (TryRandomPoint(selfPos, flatDir, wanderRadius, out var fallbackPoint))
+            {
+                Blackboard.Destination = fallbackPoint;
+                Blackboard.Self.MoveTo(fallbackPoint);
+            }
+        }
+
         protected override Node BuildTree()
         {
             return new Selector(
@@ -54,8 +94,17 @@ namespace ChaseGame.AI
             away.y = 0f;
             Vector3 dir = away.sqrMagnitude > 1e-4f ? away.normalized : bb.Self.transform.forward;
 
-            if (bb.Self.IsAbilityReady(0)) bb.Self.UseAbility(0, dir); // SpeedBoost
-            if (bb.Self.IsAbilityReady(1)) bb.Self.UseAbility(1, dir); // Decoy
+            if (!bb.IsClone)
+            {
+                if (bb.Self.IsAbilityReady(0)) bb.Self.UseAbility(0, dir); // SpeedBoost
+                if (bb.Self.IsAbilityReady(1)) bb.Self.UseAbility(1, dir); // Decoy
+            }
+            else if (Mathf.Abs(bb.CloneFleeAngleBias) > 1e-3f)
+            {
+                // Split off at an angle from the direct away vector so the clone
+                // draws the chaser along a separate path from the real runner.
+                dir = (Quaternion.Euler(0f, bb.CloneFleeAngleBias, 0f) * dir).normalized;
+            }
 
             float fleeDist = bb.Config != null ? bb.Config.WanderRadius : 6f;
             Vector3 flee = PickBestFleePoint(selfPos, threatPos, dir, fleeDist);
@@ -101,7 +150,7 @@ namespace ChaseGame.AI
         }
 
         public static bool HasJailedTeammate(Blackboard bb)
-            => FindSafeRescueTarget(bb) != null;
+            => bb != null && !bb.IsClone && FindSafeRescueTarget(bb) != null;
 
         private static NodeStatus GoRescue(Blackboard bb)
         {

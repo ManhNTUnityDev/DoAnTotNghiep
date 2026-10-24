@@ -1,11 +1,13 @@
 using UnityEngine;
 using ChaseGame.Characters;
 using ChaseGame.Match;
+using ChaseGame.AI;
 
 namespace ChaseGame.Abilities
 {
     // Chaser ability: hitscan shot. A ray from the shooter toward the aim direction
     // that strikes a free runner triggers a capture (via ICaptureService).
+    // Hitting a Runner's DecoyLure clone immediately destroys the clone and consumes the shot.
     public sealed class Gun : MonoBehaviour, IAbility
     {
         [SerializeField] private float range = 8f;
@@ -33,7 +35,10 @@ namespace ChaseGame.Abilities
         public float Range => range;
 
         public static bool IsCapturable(Character c)
-            => c != null && c.Team == Team.Runner && c.CaptureState == CaptureState.Free;
+            => c != null
+               && c.Team == Team.Runner
+               && c.CaptureState == CaptureState.Free
+               && c.GetComponent<DecoyLure>() == null;
 
         public void Use(Character self, Vector3 aim)
         {
@@ -50,6 +55,14 @@ namespace ChaseGame.Abilities
 
             if (Physics.Raycast(origin, dir, out var hit, range, hitMask))
             {
+                var decoy = hit.collider.GetComponentInParent<DecoyLure>();
+                if (decoy != null)
+                {
+                    Debug.Log($"[Gun] Shooting. Hit decoy clone {decoy.gameObject.name}");
+                    decoy.Dismiss();
+                    return;
+                }
+
                 var target = hit.collider.GetComponentInParent<Character>();
                 if (IsCapturable(target))
                 {
