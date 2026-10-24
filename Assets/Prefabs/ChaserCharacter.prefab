@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7109174174086488097}
   - component: {fileID: 8166276298149908485}
   - component: {fileID: 1396938770175068628}
+  - component: {fileID: 2914999991756562099}
   m_Layer: 0
   m_Name: ChaserCharacter
   m_TagString: Untagged
@@ -147,6 +148,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a593ac9b7df2824fa427ff6d2a962c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2914999991756562099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5063297722196815091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 138d1a2f19948b64cbbb332284815cb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  multiplier: 1.6
+  duration: 3
+  cooldown: 6
 --- !u!1001 &1721132355015665502
 PrefabInstance:
   m_ObjectHideFlags: 0

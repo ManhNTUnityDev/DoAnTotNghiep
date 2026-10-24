@@ -223,7 +223,7 @@ namespace ChaseGame.Match
             }
 
             Vector3 aim = ResolveAimDirection();
-            if (player.Team == Team.Chaser && aim.sqrMagnitude > 1e-4f)
+            if (player.Team == Team.Chaser && abilityIndex == 0 && aim.sqrMagnitude > 1e-4f)
             {
                 player.transform.rotation = Quaternion.LookRotation(aim, Vector3.up);
             }
@@ -239,7 +239,7 @@ namespace ChaseGame.Match
                 return Vector3.forward;
             }
 
-            if (player.Team == Team.Chaser)
+            if (player.Team == Team.Chaser && abilityIndex == 0)
             {
                 Vector3 referenceForward = player.transform.forward;
                 if (cameraTransform == null && Camera.main != null)

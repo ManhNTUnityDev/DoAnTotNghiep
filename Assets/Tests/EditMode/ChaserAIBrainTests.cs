@@ -119,5 +119,23 @@ namespace ChaseGame.Tests
             brain.TickForTests();
             Assert.AreEqual(new Vector3(6f, 0f, 4f), spy.LastDestination);
         }
+
+        [Test]
+        public void WhenChasingTarget_UsesSpeedBoostSkill()
+        {
+            var (ch, spy, brain) = MakeChaser();
+            var abilities = new FakeCharacterAbilities();
+            ch.SetAbilitiesForTests(abilities);
+
+            var target = new GameObject("Runner");
+            spawned.Add(target);
+            // Distance 10m (> 8m ShootRange so it enters ChaseTarget branch)
+            target.transform.position = new Vector3(10f, 0f, 0f);
+
+            brain.Blackboard.CurrentTarget = target.transform;
+            brain.TickForTests();
+
+            CollectionAssert.Contains(abilities.Used, 1, "Chaser should trigger SpeedBoost (ability 1) while chasing");
+        }
     }
 }

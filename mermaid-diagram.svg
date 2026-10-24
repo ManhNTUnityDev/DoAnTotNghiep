@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1791.1129999999998 1150.364" width="1791.1129999999998" height="1150.364" style="--bg:#1F1F1F;--fg:#CCCCCC;--line:#CCCCCC;--accent:#0078D4;--muted:#CCCCCCCC;--surface:#181818;--border:#CCCCCC;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<g class="subgraph" data-id="Decision" data-label="1. Tầng Quyết Định (8 lần/giây - AIConfig.TickRateHz = 8)">
+  <rect x="40" y="40" width="1711.1129999999998" height="573.864" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="40" y="40" width="1711.1129999999998" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="52" y="54" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">1. Tầng Quyết Định (8 lần/giây - AIConfig.TickRateHz = 8)</text>
+</g>
+<g class="subgraph" data-id="Locomotion" data-label="2. Tầng Di Chuyển (Mỗi Frame - CharacterMovement.Update)">
+  <rect x="826.7358571428572" y="673.864" width="390.35699999999986" height="436.5" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="826.7358571428572" y="673.864" width="390.35699999999986" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="838.7358571428572" y="687.864" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">2. Tầng Di Chuyển (Mỗi Frame - CharacterMovement.Update)</text>
+</g>
+<polyline class="edge" data-from="D2" data-to="F" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="407.0159999999999,597.864 407.0159999999999,657.864 1021.9143571428572,657.864 1021.9143571428572,717.864" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="D3" data-to="F" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="668.144,597.864 668.144,657.864 1021.9143571428572,657.864 1021.9143571428572,717.864" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="D4" data-to="F" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="889.9989999999999,597.864 889.9989999999999,657.864 1021.9143571428572,657.864 1021.9143571428572,717.864" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="E1" data-to="F" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1138.9005,597.864 1138.9005,657.864 1021.9143571428572,657.864 1021.9143571428572,717.864" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="E2" data-to="F" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1419.2944999999997,597.864 1419.2944999999997,657.864 1021.9143571428572,657.864 1021.9143571428572,717.864" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="E3" data-to="F" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1649.6709999999998,597.864 1649.6709999999998,657.864 1021.9143571428572,657.864 1021.9143571428572,717.864" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="A" data-to="B" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="922.6997999999999,120.9 922.6998000000001,168.9" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="B" data-to="C" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="922.6998000000001,205.8 922.6998,253.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="C" data-to="D" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Chaser" points="905.0391333333333,342.10333333333335 905.0391333333333,371.764 537.58,371.764 537.5799999999999,476.064" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="C" data-to="E" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Runner" points="940.3604666666666,342.1033333333334 940.3604666666666,371.764 1419.2945,371.764 1419.2945,476.064" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="D" data-to="D1" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="537.58,512.964 537.58,536.964 155.15049999999997,536.964 155.15049999999997,560.964" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="D" data-to="D2" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="537.58,512.964 537.58,536.964 407.0159999999999,536.964 407.0159999999999,560.964" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="D" data-to="D3" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="537.58,512.964 537.58,536.964 668.144,536.964 668.144,560.964" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="D" data-to="D4" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="537.58,512.964 537.58,536.964 889.9989999999999,536.964 889.9989999999999,560.964" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="E" data-to="E1" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1419.2944999999997,512.964 1419.2944999999997,536.964 1138.9005,536.964 1138.9005,560.964" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="E" data-to="E2" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1419.2944999999997,512.964 1419.2944999999997,536.964 1419.2944999999997,536.964 1419.2944999999997,560.964" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="E" data-to="E3" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1419.2944999999997,512.964 1419.2944999999997,536.964 1649.6709999999998,536.964 1649.6709999999998,560.964" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="F" data-to="G" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1021.9143571428572,754.764 1021.9143571428572,802.764" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="G" data-to="H" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1021.9143571428572,839.664 1021.9143571428572,887.664" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="H" data-to="I" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1021.9143571428572,924.5640000000001 1021.9143571428572,972.5640000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="I" data-to="J" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1021.9143571428572,1009.464 1021.9143571428572,1057.464" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="edge-label" data-from="C" data-to="D" data-label="Chaser">
+  <rect x="510.58000000000004" y="402.764" width="53.29" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="537.225" y="417.914" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Chaser</text>
+</g>
+<g class="edge-label" data-from="C" data-to="E" data-label="Runner">
+  <rect x="1392.2945" y="402.764" width="53.29" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="1418.9395" y="417.914" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Runner</text>
+</g>
+<g class="node" data-id="A" data-label="AIBrain.Update()" data-shape="rectangle">
+  <rect x="853.5597999999999" y="84" width="138.28000000000003" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="922.6997999999999" y="102.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">AIBrain.Update()</text>
+</g>
+<g class="node" data-id="B" data-label="Sensor.Sense(Blackboard)" data-shape="rectangle">
+  <rect x="820.2148000000001" y="168.9" width="204.97" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="922.6998000000001" y="187.35000000000002" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Sensor.Sense(Blackboard)</text>
+</g>
+<g class="node" data-id="C" data-label="Team?" data-shape="diamond">
+  <polygon points="922.6998,253.80000000000004 975.6818,306.78200000000004 922.6998,359.764 869.7178,306.78200000000004" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="922.6998" y="306.78200000000004" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Team?</text>
+</g>
+<g class="node" data-id="D" data-label="ChaserAIBrain (Selector)" data-shape="rectangle">
+  <rect x="442.1345" y="476.064" width="190.891" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="537.58" y="494.514" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">ChaserAIBrain (Selector)</text>
+</g>
+<g class="node" data-id="E" data-label="RunnerAIBrain (Selector)" data-shape="rectangle">
+  <rect x="1323.8489999999997" y="476.064" width="190.891" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1419.2944999999997" y="494.514" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">RunnerAIBrain (Selector)</text>
+</g>
+<g class="node" data-id="D1" data-label="1. CanShoot → AimAndShoot" data-shape="rectangle">
+  <rect x="56" y="560.964" width="198.30099999999996" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="155.15049999999997" y="579.4140000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">1. CanShoot → AimAndShoot</text>
+</g>
+<g class="node" data-id="D2" data-label="2. Có CurrentTarget → ChaseTarget" data-shape="rectangle">
+  <rect x="282.30099999999993" y="560.964" width="249.42999999999998" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="407.0159999999999" y="579.4140000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">2. Có CurrentTarget → ChaseTarget</text>
+</g>
+<g class="node" data-id="D3" data-label="3. Có GuardPost → GuardCage" data-shape="rectangle">
+  <rect x="559.731" y="560.964" width="216.826" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="668.144" y="579.4140000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">3. Có GuardPost → GuardCage</text>
+</g>
+<g class="node" data-id="D4" data-label="4. Mặc định → Wander" data-shape="rectangle">
+  <rect x="804.5569999999999" y="560.964" width="170.884" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="889.9989999999999" y="579.4140000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">4. Mặc định → Wander</text>
+</g>
+<g class="node" data-id="E1" data-label="1. ThreatNear (&lt;= 6m) → EscapeAndFlee" data-shape="rectangle">
+  <rect x="1003.4409999999999" y="560.964" width="270.919" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1138.9005" y="579.4140000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">1. ThreatNear (&lt;= 6m) → EscapeAndFlee</text>
+</g>
+<g class="node" data-id="E2" data-label="2. Có đồng đội bị bắt → GoRescue" data-shape="rectangle">
+  <rect x="1302.3599999999997" y="560.964" width="233.869" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1419.2944999999997" y="579.4140000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">2. Có đồng đội bị bắt → GoRescue</text>
+</g>
+<g class="node" data-id="E3" data-label="3. Mặc định → Wander" data-shape="rectangle">
+  <rect x="1564.2289999999998" y="560.964" width="170.884" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1649.6709999999998" y="579.4140000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">3. Mặc định → Wander</text>
+</g>
+<g class="node" data-id="F" data-label="Character.MoveTo(destination)" data-shape="rectangle">
+  <rect x="908.6848571428571" y="717.864" width="226.45899999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1021.9143571428572" y="736.3140000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Character.MoveTo(destination)</text>
+</g>
+<g class="node" data-id="G" data-label="NavMeshAgent.SetDestination()" data-shape="rectangle">
+  <rect x="907.9438571428572" y="802.764" width="227.94099999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1021.9143571428572" y="821.214" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">NavMeshAgent.SetDestination()</text>
+</g>
+<g class="node" data-id="H" data-label="Lấy agent.desiredVelocity.normalized" data-shape="rectangle">
+  <rect x="889.4188571428572" y="887.664" width="264.991" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1021.9143571428572" y="906.114" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Lấy agent.desiredVelocity.normalized</text>
+</g>
+<g class="node" data-id="I" data-label="CharacterController.Move(velocity * dt)" data-shape="rectangle">
+  <rect x="884.9728571428572" y="972.5640000000001" width="273.8829999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1021.9143571428572" y="991.0140000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">CharacterController.Move(velocity * dt)</text>
+</g>
+<g class="node" data-id="J" data-label="Đồng bộ ngược: agent.nextPosition = transform.position" data-shape="rectangle">
+  <rect x="842.7358571428572" y="1057.464" width="358.35699999999986" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1021.9143571428572" y="1075.914" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Đồng bộ ngược: agent.nextPosition = transform.position</text>
+</g>
+</svg>

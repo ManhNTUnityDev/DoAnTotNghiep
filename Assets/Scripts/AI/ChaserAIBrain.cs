@@ -62,6 +62,15 @@ namespace ChaseGame.AI
             // Wander smoothly finishes walking to the runner's last seen position
             // instead of snapping 180° back to a stale pre-chase wander point.
             bb.Destination = targetPos;
+
+            if (bb.Self.IsAbilityReady(1))
+            {
+                Vector3 dir = targetPos - bb.Self.transform.position;
+                dir.y = 0f;
+                Vector3 aim = dir.sqrMagnitude > 1e-4f ? dir.normalized : bb.Self.transform.forward;
+                bb.Self.UseAbility(1, aim); // SpeedBoost
+            }
+
             bb.Self.MoveTo(targetPos);
             return NodeStatus.Running;
         }
