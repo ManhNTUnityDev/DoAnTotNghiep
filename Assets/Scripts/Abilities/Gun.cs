@@ -28,6 +28,9 @@ namespace ChaseGame.Abilities
         }
 
         public bool IsReady => timer == null || timer.IsReady(Time.time);
+        public float CooldownRemaining => timer != null ? timer.Remaining(Time.time) : 0f;
+        public float CooldownNormalized => timer != null ? timer.NormalizedRemaining(Time.time) : 0f;
+        public float Range => range;
 
         public static bool IsCapturable(Character c)
             => c != null && c.Team == Team.Runner && c.CaptureState == CaptureState.Free;
@@ -51,6 +54,7 @@ namespace ChaseGame.Abilities
                 if (IsCapturable(target))
                 {
                     capture?.Capture(target);
+                    Debug.Log($"[Gun] Shooting. Captured {target.gameObject.name}");
                 }
             }
         }

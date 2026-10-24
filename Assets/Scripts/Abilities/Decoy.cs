@@ -22,6 +22,8 @@ namespace ChaseGame.Abilities
         }
 
         public bool IsReady => timer == null || timer.IsReady(Time.time);
+        public float CooldownRemaining => timer != null ? timer.Remaining(Time.time) : 0f;
+        public float CooldownNormalized => timer != null ? timer.NormalizedRemaining(Time.time) : 0f;
 
         public void Use(Character self, Vector3 aim)
         {
@@ -42,6 +44,7 @@ namespace ChaseGame.Abilities
             var go = new GameObject("DecoyLure");
             go.transform.position = pos;
             go.AddComponent<DecoyLure>().SetLifetime(lifetime);
+            Debug.Log("[Decoy] Use Decoy");
         }
     }
 }

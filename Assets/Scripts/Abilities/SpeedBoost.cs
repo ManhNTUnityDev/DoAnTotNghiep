@@ -21,6 +21,9 @@ namespace ChaseGame.Abilities
         }
 
         public bool IsReady => timer == null || timer.IsReady(Time.time);
+        public float CooldownRemaining => timer != null ? timer.Remaining(Time.time) : 0f;
+        public float CooldownNormalized => timer != null ? timer.NormalizedRemaining(Time.time) : 0f;
+        public bool IsBoostActive => boostEndsAt > 0f && Time.time < boostEndsAt;
 
         public void Use(Character self, Vector3 aim)
         {
