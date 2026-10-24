@@ -179,10 +179,17 @@ namespace ChaseGame.Tests.PlayMode
             Physics.SyncTransforms();
 
             gun.Use(chaser, toClone.normalized);
-            yield return null; // allow Destroy() to complete at end of frame
+            Assert.IsNotNull(gun.LastSpawnedProjectile, "Gun should spawn an EggProjectile");
 
-            Assert.IsTrue(cloneLure == null, "Clone should be destroyed immediately when hit by Gun");
-            Assert.IsFalse( gun.IsReady, "Chaser's Gun should be put on cooldown after shooting the clone");
+            float flightWait = 0f;
+            while (flightWait < 0.5f && cloneLure != null)
+            {
+                flightWait += Time.deltaTime;
+                yield return null;
+            }
+
+            Assert.IsTrue(cloneLure == null, "Clone should be destroyed when hit by the flying EggProjectile");
+            Assert.IsFalse(gun.IsReady, "Chaser's Gun should be put on cooldown after shooting the clone");
             Assert.AreEqual(0, capture.ActiveCages.Count, "Shooting a decoy clone must NOT create a cage");
         }
     }

@@ -5,18 +5,31 @@ using ChaseGame.AI;
 
 namespace ChaseGame.Abilities
 {
-    // Chaser ability: hitscan shot. A ray from the shooter toward the aim direction
-    // that strikes a free runner triggers a capture (via ICaptureService).
-    // Hitting a Runner's DecoyLure clone immediately destroys the clone and consumes the shot.
+    // Chaser ability: shoots an egg projectile forward along the aim direction up to
+    // `range` meters (configurable in Inspector). Striking a free runner triggers a
+    // capture (via ICaptureService); striking a Runner's DecoyLure clone destroys the clone.
     public sealed class Gun : MonoBehaviour, IAbility
     {
+        [Header("Range & Cooldown")]
+        [Tooltip("Maximum distance (meters) the egg projectile travels before disappearing.")]
         [SerializeField] private float range = 8f;
         [SerializeField] private float cooldown = 1f;
+
+        [Header("Egg Projectile")]
+        [Tooltip("Prefab for the egg projectile (e.g. a Sphere prefab). Falls back to a runtime Sphere if unassigned.")]
+        [SerializeField] private GameObject eggProjectilePrefab;
+        [Tooltip("Flight speed (meters/second) of the fired egg projectile.")]
+        [SerializeField] private float projectileSpeed = 22f;
+        [Tooltip("Collision sweep radius of the egg projectile.")]
+        [SerializeField] private float projectileRadius = 0.18f;
         [SerializeField] private float eyeHeight = 0.6f;
+        [SerializeField] private float muzzleForwardOffset = 0.6f;
         [SerializeField] private LayerMask hitMask = ~0;
 
         private ICaptureService capture;
         private CooldownTimer timer;
+
+        public EggProjectile LastSpawnedProjectile { get; private set; }
 
         private void Awake()
         {
@@ -33,6 +46,12 @@ namespace ChaseGame.Abilities
         public float CooldownRemaining => timer != null ? timer.Remaining(Time.time) : 0f;
         public float CooldownNormalized => timer != null ? timer.NormalizedRemaining(Time.time) : 0f;
         public float Range => range;
+        public float ProjectileSpeed => projectileSpeed;
+
+        public void SetRangeForTests(float newRange)
+        {
+            range = Mathf.Max(0.5f, newRange);
+        }
 
         public static bool IsCapturable(Character c)
             => c != null
@@ -42,6 +61,11 @@ namespace ChaseGame.Abilities
 
         public void Use(Character self, Vector3 aim)
         {
+            if (self == null)
+            {
+                return;
+            }
+
             if (timer != null && !timer.IsReady(Time.time))
             {
                 return;
@@ -50,26 +74,45 @@ namespace ChaseGame.Abilities
             timer?.Trigger(Time.time);
 
             Vector3 dir = aim.sqrMagnitude > 1e-4f ? aim.normalized : self.transform.forward;
-            // Start beyond the shooter's own body so the ray does not hit self.
-            Vector3 origin = self.transform.position + Vector3.up * eyeHeight + dir * 0.6f;
-
-            if (Physics.Raycast(origin, dir, out var hit, range, hitMask))
+            if (dir.sqrMagnitude < 1e-4f)
             {
-                var decoy = hit.collider.GetComponentInParent<DecoyLure>();
-                if (decoy != null)
-                {
-                    Debug.Log($"[Gun] Shooting. Hit decoy clone {decoy.gameObject.name}");
-                    decoy.Dismiss();
-                    return;
-                }
-
-                var target = hit.collider.GetComponentInParent<Character>();
-                if (IsCapturable(target))
-                {
-                    capture?.Capture(target);
-                    Debug.Log($"[Gun] Shooting. Captured {target.gameObject.name}");
-                }
+                dir = Vector3.forward;
             }
+
+            // Start beyond the shooter's own body so the projectile spawns clearly in front of the Chaser.
+            Vector3 origin = self.transform.position + Vector3.up * eyeHeight + dir * muzzleForwardOffset;
+            Quaternion rot = Quaternion.LookRotation(dir, Vector3.up);
+
+            GameObject eggGo;
+            if (eggProjectilePrefab != null)
+            {
+                eggGo = Instantiate(eggProjectilePrefab, origin, rot);
+                eggGo.name = "EggProjectile";
+            }
+            else
+            {
+                eggGo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                eggGo.name = "EggProjectile";
+                eggGo.transform.SetPositionAndRotation(origin, rot);
+                eggGo.transform.localScale = new Vector3(0.28f, 0.36f, 0.28f);
+            }
+
+            var projectile = eggGo.GetComponent<EggProjectile>();
+            if (projectile == null)
+            {
+                projectile = eggGo.AddComponent<EggProjectile>();
+            }
+
+            projectile.Initialize(
+                self,
+                dir,
+                range,
+                projectileSpeed,
+                projectileRadius,
+                hitMask,
+                capture);
+
+            LastSpawnedProjectile = projectile;
         }
     }
 }

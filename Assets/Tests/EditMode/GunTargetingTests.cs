@@ -51,5 +51,29 @@ namespace ChaseGame.Tests
 
             Assert.IsFalse(Gun.IsCapturable(clone), "A decoy clone must never be capturable into a cage");
         }
+
+        [Test]
+        public void GunUse_SpawnsEggProjectile_WhichFliesForwardAndDestroysAtMaxRange()
+        {
+            var chaser = NewChar(Team.Chaser, CaptureState.Free);
+            var gun = chaser.gameObject.AddComponent<Gun>();
+            gun.SetRangeForTests(6f);
+
+            gun.Use(chaser, Vector3.forward);
+
+            var egg = gun.LastSpawnedProjectile;
+            Assert.IsNotNull(egg, "Gun.Use should spawn an EggProjectile");
+            spawned.Add(egg.gameObject);
+            Assert.AreEqual(6f, egg.MaxRange, 1e-4f);
+
+            // Step partially (e.g. ~2.2 meters at 22m/s -> 0.1s)
+            egg.Step(0.1f);
+            Assert.IsTrue(egg != null, "Egg should still exist before reaching max range");
+            Assert.Greater(egg.TraveledDistance, 2f);
+
+            // Step beyond remaining range -> egg should self-destruct
+            egg.Step(1f);
+            Assert.IsTrue(egg == null, "Egg should destroy itself upon reaching max range");
+        }
     }
 }

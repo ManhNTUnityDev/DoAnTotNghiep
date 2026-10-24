@@ -76,6 +76,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats: {fileID: 11400000, guid: 5103eace477b7ab41b5e6887be66797d, type: 2}
+  turnSpeed: 540
+  steeringSmoothRate: 16
 --- !u!114 &7294893955327729227
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125,7 +127,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   range: 8
   cooldown: 1
+  eggProjectilePrefab: {fileID: 3316303793381661434, guid: 3e651c27421b94e1bb3c820571fd3216, type: 3}
+  projectileSpeed: 22
+  projectileRadius: 0.18
   eyeHeight: 0.6
+  muzzleForwardOffset: 0.6
   hitMask:
     serializedVersion: 2
     m_Bits: 4294967295
