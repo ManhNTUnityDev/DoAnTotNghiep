@@ -212,7 +212,7 @@ namespace ChaseGame.Match
         public void TriggerAbility()
         {
             TryAutoBindIfNeeded();
-            if (player == null || player.CaptureState == CaptureState.Jailed)
+            if (player == null || !player.CanAct)
             {
                 return;
             }

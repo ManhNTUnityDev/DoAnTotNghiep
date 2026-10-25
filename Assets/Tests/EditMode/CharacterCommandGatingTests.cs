@@ -91,5 +91,50 @@ namespace ChaseGame.Tests
             character.CaptureState = CaptureState.Jailed;
             Assert.AreEqual(2, spy.StopCallCount);
         }
+
+        [Test]
+        public void MoveAndMoveTo_WhenActionLocked_AreNoOp()
+        {
+            character.IsActionLocked = true;
+            character.Move(Vector3.forward);
+            character.MoveTo(new Vector3(5f, 0f, 5f));
+
+            Assert.AreEqual(0, spy.CallCount);
+            Assert.AreEqual(0, spy.MoveToCallCount);
+        }
+
+        [Test]
+        public void EnteringActionLock_StopsMovementOnce_AndUnlockingRestoresMovement()
+        {
+            character.IsActionLocked = true;
+            Assert.AreEqual(1, spy.StopCallCount);
+
+            character.IsActionLocked = true; // idempotent
+            Assert.AreEqual(1, spy.StopCallCount);
+
+            character.IsActionLocked = false;
+            character.Move(Vector3.right);
+            Assert.AreEqual(1, spy.CallCount);
+            Assert.AreEqual(Vector3.right, spy.LastDirection);
+        }
+
+        [Test]
+        public void Abilities_WhenActionLocked_AreBlockedAndNotReady()
+        {
+            var fakeAbilities = new FakeCharacterAbilities();
+            character.SetAbilitiesForTests(fakeAbilities);
+
+            character.IsActionLocked = true;
+            Assert.IsFalse(character.IsAbilityReady(0));
+
+            character.UseAbility(0, Vector3.forward);
+            Assert.AreEqual(0, fakeAbilities.Used.Count);
+
+            character.IsActionLocked = false;
+            Assert.IsTrue(character.IsAbilityReady(0));
+
+            character.UseAbility(0, Vector3.forward);
+            Assert.AreEqual(1, fakeAbilities.Used.Count);
+        }
     }
 }

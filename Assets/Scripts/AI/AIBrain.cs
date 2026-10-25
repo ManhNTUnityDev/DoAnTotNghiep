@@ -51,6 +51,11 @@ namespace ChaseGame.AI
                 return;
             }
 
+            if (Character != null && !Character.CanAct)
+            {
+                return;
+            }
+
             accum += Time.deltaTime;
             if (accum < tickInterval)
             {

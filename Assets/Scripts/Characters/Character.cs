@@ -9,6 +9,7 @@ namespace ChaseGame.Characters
         private ICharacterMovement movement;
         private ICharacterAbilities abilities;
         private CaptureState captureState = CaptureState.Free;
+        private bool isActionLocked;
 
         public Team Team => team;
 
@@ -26,6 +27,26 @@ namespace ChaseGame.Characters
             }
         }
 
+        /// <summary>
+        /// Locks movement and ability usage (e.g. Chasers waiting during the pre-match head-start)
+        /// without marking the character as Jailed.
+        /// </summary>
+        public bool IsActionLocked
+        {
+            get => isActionLocked;
+            set
+            {
+                bool enteringLock = value && !isActionLocked;
+                isActionLocked = value;
+                if (enteringLock)
+                {
+                    movement?.Stop();
+                }
+            }
+        }
+
+        public bool CanAct => captureState != CaptureState.Jailed && !isActionLocked;
+
         private void Awake()
         {
             // Resolve sibling Body components if a test hasn't injected them.
@@ -35,7 +56,7 @@ namespace ChaseGame.Characters
 
         public void Move(Vector3 direction)
         {
-            if (captureState == CaptureState.Jailed)
+            if (!CanAct)
             {
                 return;
             }
@@ -45,7 +66,7 @@ namespace ChaseGame.Characters
 
         public void MoveTo(Vector3 destination)
         {
-            if (captureState == CaptureState.Jailed)
+            if (!CanAct)
             {
                 return;
             }
@@ -60,7 +81,7 @@ namespace ChaseGame.Characters
 
         public void UseAbility(int id, Vector3 aim)
         {
-            if (captureState == CaptureState.Jailed)
+            if (!CanAct)
             {
                 return;
             }
@@ -68,7 +89,7 @@ namespace ChaseGame.Characters
             abilities?.UseAbility(id, aim);
         }
 
-        public bool IsAbilityReady(int id) => abilities != null && abilities.IsReady(id);
+        public bool IsAbilityReady(int id) => CanAct && abilities != null && abilities.IsReady(id);
 
         // Test seam: inject a movement double without a CharacterController.
         public void SetMovementForTests(ICharacterMovement injected)
