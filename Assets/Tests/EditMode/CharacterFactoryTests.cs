@@ -12,14 +12,14 @@ namespace ChaseGame.Tests
     {
         private readonly List<GameObject> spawned = new List<GameObject>();
         private TeamRoster roster;
-        private CaptureServiceStub capture;
+        private JailService capture;
         private CharacterFactory factory;
 
         [SetUp]
         public void SetUp()
         {
             roster = new TeamRoster();
-            capture = new CaptureServiceStub();
+            capture = new JailService();
             factory = new CharacterFactory(roster, capture);
         }
 

@@ -87,7 +87,7 @@ namespace ChaseGame.Tests.PlayMode
             chaser.SetTeamForTests(Team.Chaser);
             chaserGo.SetActive(true);
 
-            var capture = new CaptureServiceStub();
+            var capture = new JailService();
             gun.Configure(capture);
 
             var roster = new TeamRoster();

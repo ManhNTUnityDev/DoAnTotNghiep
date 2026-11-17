@@ -10,28 +10,25 @@ namespace ChaseGame.Infrastructure
 {
     // Match bootstrap (spec §9): spawns both teams from their spawn points, promotes one
     // character (slot 0 of the randomly chosen player team) to the human PlayerBrain and
-    // the rest to AI brains, registers AI chasers with the coordinator, and points the
-    // follow camera at the player. Replaces PlayerBootstrap.
+    // the rest to AI brains, and points the follow camera at the player.
+    // Replaces PlayerBootstrap.
     public sealed class SpawnManager : IStartable
     {
         private readonly CharacterFactory factory;
         private readonly ITeamRoster roster;
         private readonly IInputService input;
         private readonly SpawnSettings settings;
-        private readonly ChaserCoordinator coordinator;
 
         public SpawnManager(
             CharacterFactory factory,
             ITeamRoster roster,
             IInputService input,
-            SpawnSettings settings,
-            ChaserCoordinator coordinator)
+            SpawnSettings settings)
         {
             this.factory = factory;
             this.roster = roster;
             this.input = input;
             this.settings = settings;
-            this.coordinator = coordinator;
         }
 
         // Pure: a coin flip decides which team the human plays.
@@ -93,7 +90,6 @@ namespace ChaseGame.Infrastructure
             {
                 var brain = character.gameObject.AddComponent<ChaserAIBrain>();
                 brain.Initialize(character, roster, settings.aiConfig);
-                coordinator.Register(brain.Blackboard);
             }
             else
             {

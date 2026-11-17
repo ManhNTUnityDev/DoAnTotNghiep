@@ -18,10 +18,6 @@ namespace ChaseGame.AI
                 new Sequence(
                     new ConditionNode(bb => bb.CurrentTarget != null),
                     new ActionNode(ChaseTarget)),
-                // Guard: hold the cage post the coordinator assigned (keeps rescuers away).
-                new Sequence(
-                    new ConditionNode(bb => bb.GuardPost.HasValue),
-                    new ActionNode(GuardCage)),
                 // Otherwise roam.
                 new ActionNode(Wander));
         }
@@ -72,13 +68,6 @@ namespace ChaseGame.AI
             }
 
             bb.Self.MoveTo(targetPos);
-            return NodeStatus.Running;
-        }
-
-        private static NodeStatus GuardCage(Blackboard bb)
-        {
-            bb.Destination = null;
-            bb.Self.MoveTo(bb.GuardPost.Value);
             return NodeStatus.Running;
         }
     }

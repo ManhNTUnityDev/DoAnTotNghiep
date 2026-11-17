@@ -120,7 +120,7 @@ namespace ChaseGame.Tests.PlayMode
         public IEnumerator DecoyClone_MovesIndependently_AndDestroysOnGunShotWithoutCreatingCage()
         {
             var roster = new TeamRoster();
-            var capture = new CaptureServiceStub();
+            var capture = new JailService();
 
             var chaserGo = new GameObject("Chaser");
             spawned.Add(chaserGo);

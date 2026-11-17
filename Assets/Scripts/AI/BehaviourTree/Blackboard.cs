@@ -16,9 +16,8 @@ namespace ChaseGame.AI.BehaviourTree
         public Transform NearestThreat;  // runner: nearest visible chaser
 
         public Vector3? Destination;     // scratch for wander / last-known targets
-        public Vector3? GuardPost;       // chaser: cage post assigned by ChaserCoordinator
         public bool IsFleeing;           // runner: hysteresis flag to prevent ping-pong at threat boundary
-        public bool IsClone;             // runner decoy clone: disables skills/rescue and diverges flee path
+        public bool IsClone;             // runner decoy clone: disables skills and diverges flee path
         public float CloneFleeAngleBias; // horizontal angle offset (degrees) so clone splits from real runner
     }
 }

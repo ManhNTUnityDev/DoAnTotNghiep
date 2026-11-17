@@ -4,9 +4,9 @@ using ChaseGame.AI.BehaviourTree;
 
 namespace ChaseGame.AI
 {
-    // Runner behaviour (spec §8): flee threats (using escape skills), otherwise
-    // approach a jailed teammate to rescue (contact-rescue lands with the real
-    // JailSystem), otherwise wander.
+    // Runner behaviour (spec §8): flee threats (using escape skills), otherwise wander.
+    // Rescue was dropped from the design — a jailed runner stays caged for the rest of
+    // the match, so there is no branch that walks toward a jailed teammate.
     public sealed class RunnerAIBrain : AIBrain
     {
         private const float FleeExitMultiplier = 1.35f;
@@ -58,9 +58,6 @@ namespace ChaseGame.AI
                 new Sequence(
                     new ConditionNode(ThreatNear),
                     new ActionNode(EscapeAndFlee)),
-                new Sequence(
-                    new ConditionNode(HasJailedTeammate),
-                    new ActionNode(GoRescue)),
                 new ActionNode(Wander));
         }
 
@@ -149,89 +146,5 @@ namespace ChaseGame.AI
             return bestPoint;
         }
 
-        public static bool HasJailedTeammate(Blackboard bb)
-            => bb != null && !bb.IsClone && FindSafeRescueTarget(bb) != null;
-
-        private static NodeStatus GoRescue(Blackboard bb)
-        {
-            Transform nearest = FindSafeRescueTarget(bb);
-            if (nearest == null)
-            {
-                return NodeStatus.Failure;
-            }
-
-            bb.Destination = null;
-            bb.Self.MoveTo(nearest.position);
-            return NodeStatus.Running;
-        }
-
-        private static Transform FindSafeRescueTarget(Blackboard bb)
-        {
-            if (bb.Roster == null)
-            {
-                return null;
-            }
-
-            var jailed = bb.Roster.GetJailedRunners();
-            if (jailed == null || jailed.Count == 0)
-            {
-                return null;
-            }
-
-            float rescueSafeRadius = bb.Config != null ? bb.Config.RescueThreatRadius : 5f;
-            Vector3 self = bb.Self != null ? bb.Self.transform.position : Vector3.zero;
-            Transform nearest = null;
-            float bestSqr = float.MaxValue;
-
-            foreach (var r in jailed)
-            {
-                if (r == null)
-                {
-                    continue;
-                }
-
-                Vector3 cagePos = r.transform.position;
-                if (IsGuardedByThreat(bb, cagePos, rescueSafeRadius))
-                {
-                    continue;
-                }
-
-                float d = (cagePos - self).sqrMagnitude;
-                if (d < bestSqr)
-                {
-                    bestSqr = d;
-                    nearest = r.transform;
-                }
-            }
-
-            return nearest;
-        }
-
-        private static bool IsGuardedByThreat(Blackboard bb, Vector3 targetPos, float safeRadius)
-        {
-            if (safeRadius <= 0f)
-            {
-                return false;
-            }
-
-            if (bb.NearestThreat != null &&
-                PlanarDistance(bb.NearestThreat.position, targetPos) <= safeRadius)
-            {
-                return true;
-            }
-
-            if (bb.Roster?.Chasers != null)
-            {
-                foreach (var chaser in bb.Roster.Chasers)
-                {
-                    if (chaser != null && PlanarDistance(chaser.transform.position, targetPos) <= safeRadius)
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
     }
 }

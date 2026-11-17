@@ -70,26 +70,6 @@ namespace ChaseGame.Tests
         }
 
         [Test]
-        public void WhenNoThreatButJailedTeammate_MovesToRescue()
-        {
-            var (ch, spy, abilities, brain) = MakeRunner();
-            var roster = (TeamRoster)brain.Blackboard.Roster;
-            var jailed = new GameObject("Jailed");
-            spawned.Add(jailed);
-            jailed.transform.position = new Vector3(7f, 0f, 2f);
-            var jailedCh = jailed.AddComponent<Character>();
-            jailedCh.SetTeamForTests(Team.Runner);
-            jailedCh.CaptureState = CaptureState.Jailed;
-            roster.Add(jailedCh);
-
-            brain.Blackboard.NearestThreat = null;
-            brain.TickForTests();
-
-            Assert.GreaterOrEqual(spy.MoveToCallCount, 1);
-            Assert.AreEqual(new Vector3(7f, 0f, 2f), spy.LastDestination);
-        }
-
-        [Test]
         public void ThreatNear_AppliesHysteresis_DoesNotDropFleeJustOutsideBaseRadius()
         {
             var (ch, spy, abilities, brain) = MakeRunner();
@@ -115,30 +95,6 @@ namespace ChaseGame.Tests
         }
 
         [Test]
-        public void WhenJailedTeammateIsGuardedByChaser_DoesNotSuicidallyRushCage()
-        {
-            var (ch, spy, abilities, brain) = MakeRunner();
-            var roster = (TeamRoster)brain.Blackboard.Roster;
-
-            var jailed = new GameObject("Jailed");
-            spawned.Add(jailed);
-            jailed.transform.position = new Vector3(10f, 0f, 0f);
-            var jailedCh = jailed.AddComponent<Character>();
-            jailedCh.SetTeamForTests(Team.Runner);
-            jailedCh.CaptureState = CaptureState.Jailed;
-            roster.Add(jailedCh);
-
-            var guard = new GameObject("GuardChaser");
-            spawned.Add(guard);
-            guard.transform.position = new Vector3(9f, 0f, 0f); // 1m from cage (within 5m RescueThreatRadius)
-            var guardCh = guard.AddComponent<Character>();
-            guardCh.SetTeamForTests(Team.Chaser);
-            roster.Add(guardCh);
-
-            Assert.IsFalse(RunnerAIBrain.HasJailedTeammate(brain.Blackboard));
-        }
-
-        [Test]
         public void CloneRunner_WhenThreatNear_FleesWithoutUsingSkillsAndDivergesDirection()
         {
             var (ch, spy, abilities, brain) = MakeRunner();
@@ -156,24 +112,6 @@ namespace ChaseGame.Tests
             Assert.Greater(spy.MoveToCallCount, callsBefore);
             // With +60 deg bias from (-1, 0, 0), the flee target should have a non-zero z component.
             Assert.Greater(Mathf.Abs(spy.LastDestination.z), 0.5f, "Clone should diverge at an angle from the direct away vector");
-        }
-
-        [Test]
-        public void CloneRunner_NeverAttemptsToRescueJailedTeammate()
-        {
-            var (ch, spy, abilities, brain) = MakeRunner();
-            brain.ConfigureAsClone(Vector3.forward);
-
-            var roster = (TeamRoster)brain.Blackboard.Roster;
-            var jailed = new GameObject("Jailed");
-            spawned.Add(jailed);
-            jailed.transform.position = new Vector3(7f, 0f, 2f);
-            var jailedCh = jailed.AddComponent<Character>();
-            jailedCh.SetTeamForTests(Team.Runner);
-            jailedCh.CaptureState = CaptureState.Jailed;
-            roster.Add(jailedCh);
-
-            Assert.IsFalse(RunnerAIBrain.HasJailedTeammate(brain.Blackboard), "Clone runner must ignore jailed teammates");
         }
 
         [Test]

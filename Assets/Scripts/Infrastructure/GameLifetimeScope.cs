@@ -22,15 +22,13 @@ namespace ChaseGame.Infrastructure
             // Match services shared across every spawned character.
             builder.RegisterInstance(spawnSettings);
             builder.Register<ITeamRoster, TeamRoster>(Lifetime.Singleton);
-            builder.Register<ICaptureService, CaptureServiceStub>(Lifetime.Singleton);
+            // Jail system: the cage prefab is scene-authored, so build the service by hand.
+            builder.Register<ICaptureService>(_ => new JailService(spawnSettings.cagePrefab), Lifetime.Singleton);
             builder.Register<CharacterFactory>(Lifetime.Singleton);
 
             // Match end-condition subsystem.
             builder.Register<MatchEvaluator>(Lifetime.Singleton);
             builder.RegisterComponentInHierarchy<MatchController>();
-
-            // The coordinator ticks (ITickable) and is injected into SpawnManager (AsSelf).
-            builder.RegisterEntryPoint<ChaserCoordinator>().AsSelf();
 
             builder.RegisterEntryPoint<SpawnManager>();
         }

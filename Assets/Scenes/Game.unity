@@ -1935,8 +1935,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "B\u1EA1n \u0111\xE3 b\u1ECB b\u1EAFt \u2014 \u0111ang xem \u0111\u1ED3ng
-    \u0111\u1ED9i\u2026"
+  m_Text: "B\u1EA1n \u0111\xE3 b\u1ECB b\u1EAFt \u2014 ch\u1EDD h\u1EBFt tr\u1EADn"
 --- !u!222 &823482875
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -14,6 +14,7 @@ namespace ChaseGame.Characters
         private Animator animator;
         private ICharacterAbilities iAbilities;
         private ICharacterMovement iMovement;
+        private bool hasJailedParameter;
 
         // Animator Hashes
         private static readonly int SpeedHash = Animator.StringToHash("Speed");
@@ -32,6 +33,27 @@ namespace ChaseGame.Characters
 
             iMovement = movement;
             iAbilities = abilities;
+            hasJailedParameter = HasBoolParameter(animator, "IsJailed");
+        }
+
+        // Guards against controllers that don't declare IsJailed (Unity logs a warning
+        // every frame for a missing parameter).
+        private static bool HasBoolParameter(Animator target, string parameterName)
+        {
+            if (target == null || target.runtimeAnimatorController == null)
+            {
+                return false;
+            }
+
+            foreach (var parameter in target.parameters)
+            {
+                if (parameter.type == AnimatorControllerParameterType.Bool && parameter.name == parameterName)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void OnEnable()
@@ -70,8 +92,11 @@ namespace ChaseGame.Characters
                 animator.SetFloat(SpeedHash, horizontalVelocity.magnitude, 0.1f, Time.deltaTime);
             }
 
-            // 2. Update Capture State (Jailed)
-            // animator.SetBool(IsJailedHash, character.CaptureState == CaptureState.Jailed);
+            // 2. Update Capture State (Jailed) — drives the caged idle pose.
+            if (hasJailedParameter)
+            {
+                animator.SetBool(IsJailedHash, character.CaptureState == CaptureState.Jailed);
+            }
         }
 
         private void HandleAbilityUsed(int abilityId)
