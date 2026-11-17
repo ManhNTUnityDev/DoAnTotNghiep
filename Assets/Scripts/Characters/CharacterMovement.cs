@@ -12,6 +12,11 @@ namespace ChaseGame.Characters
         [SerializeField] private float turnSpeed = 540f;
         [SerializeField] private float steeringSmoothRate = 16f;
 
+        [Tooltip("Turn the body toward its movement direction. AI needs this; a first-person " +
+                 "character does not, because FirstPersonView owns its yaw - leaving both on makes " +
+                 "the view spin every time the joystick pushes sideways.")]
+        [SerializeField] private bool faceMoveDirection = true;
+
         private CharacterController controller;
         private NavMeshAgent agent;      // optional: present on AI-capable prefabs
         private Vector3 moveDirection;
@@ -23,6 +28,19 @@ namespace ChaseGame.Characters
         public float SpeedMultiplier => speedMultiplier;
 
         private float BaseSpeed => stats != null ? stats.MoveSpeed : 5f;
+
+        // Current top speed, boost included. Read by CharacterAnimationController to normalize
+        // the Animator's Speed parameter to 0..1.
+        public float MaxSpeed => BaseSpeed * speedMultiplier;
+
+        public bool FaceMoveDirection => faceMoveDirection;
+
+        // FirstPersonView turns this off for the character it drives; Decoy turns it back on for a
+        // clone copied from a first-person player, which has no FirstPersonView of its own.
+        public void SetFaceMoveDirection(bool value)
+        {
+            faceMoveDirection = value;
+        }
 
         // Temporary speed scaling (e.g. SpeedBoost). Keeps agent.speed in sync so the
         // path-steering desiredVelocity matches the body's actual speed.
@@ -168,7 +186,7 @@ namespace ChaseGame.Characters
                 moveDirection = SmoothDirection(moveDirection, rawDirection, steeringSmoothRate, Time.deltaTime);
             }
 
-            if (moveDirection.sqrMagnitude > 1e-4f)
+            if (faceMoveDirection && moveDirection.sqrMagnitude > 1e-4f)
             {
                 transform.rotation = ComputeNextRotation(transform.rotation, moveDirection, turnSpeed, Time.deltaTime);
             }

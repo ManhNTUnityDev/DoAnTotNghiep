@@ -12,11 +12,14 @@ namespace ChaseGame.Input
     /// </summary>
     [RequireComponent(typeof(RectTransform))]
     [DisallowMultipleComponent]
+    // IPointerExitHandler is deliberately NOT implemented: a look pad must keep tracking while the
+    // finger leaves its rect mid-drag (Unity keeps sending OnDrag to the handler that took the
+    // pointer down), and the handler that used to be here threw NotImplementedException on every
+    // exit. OnPointerUp ends the drag; that is the only end this pad needs.
     public class CameraLookTouchPad : MonoBehaviour,
         IPointerDownHandler,
         IDragHandler,
-        IPointerUpHandler,
-        IPointerExitHandler
+        IPointerUpHandler
     {
         private const int NoPointer = int.MinValue;
         private const float ReferenceScreenHeight = 1080f;
@@ -209,9 +212,5 @@ namespace ChaseGame.Input
             }
         }
 
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

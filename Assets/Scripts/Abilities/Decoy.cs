@@ -181,6 +181,20 @@ namespace ChaseGame.Abilities
             if (cloneMovement != null)
             {
                 cloneMovement.SetSpeedMultiplier(1f);
+
+                // A clone of a first-person player inherits faceMoveDirection = false, because
+                // FirstPersonView turned it off on the original. The clone has no view driver of
+                // its own, so without this it would never turn and would strafe sideways forever.
+                cloneMovement.SetFaceMoveDirection(true);
+            }
+
+            // 4b. Strip the first-person rig: the clone is AI-driven and must not try to steer a
+            //     camera or own its yaw. (It is never Activated, so this is belt and braces - but
+            //     it also stops the clone from hiding its own renderers.)
+            foreach (var view in cloneGo.GetComponents<Infrastructure.FirstPersonView>())
+            {
+                view.enabled = false;
+                DestroyComponentSafe(view);
             }
 
             var agent = cloneGo.GetComponent<NavMeshAgent>();

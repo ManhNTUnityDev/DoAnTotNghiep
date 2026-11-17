@@ -41,9 +41,29 @@ namespace ChaseGame.Infrastructure
             SpawnTeam(Team.Chaser, settings.chaserPrefab, settings.chaserSpawnPoints, playerTeam);
             SpawnTeam(Team.Runner, settings.runnerPrefab, settings.runnerSpawnPoints, playerTeam);
 
-            if (settings.followCamera != null && roster.PlayerCharacter != null)
+            if (roster.PlayerCharacter != null)
             {
-                settings.followCamera.SetTarget(roster.PlayerCharacter.transform);
+                ActivatePlayerCamera(roster.PlayerCharacter);
+            }
+        }
+
+        // First person whenever the player's prefab carries a FirstPersonView rig; otherwise fall
+        // back to the orbit camera, so a prefab without the rig still plays.
+        private void ActivatePlayerCamera(Character player)
+        {
+            Transform camTransform = settings.followCamera != null ? settings.followCamera.transform : null;
+            var view = player.GetComponent<FirstPersonView>();
+
+            if (view != null && camTransform != null)
+            {
+                view.enabled = true;
+                view.Activate(camTransform, CameraLookTouchPad.ActiveInstance);
+                return;
+            }
+
+            if (settings.followCamera != null)
+            {
+                settings.followCamera.SetTarget(player.transform);
             }
         }
 
@@ -70,6 +90,16 @@ namespace ChaseGame.Infrastructure
                 }
 
                 bool isPlayer = team == playerTeam && i == 0;
+
+                // Keep the first-person view model only on the character the human drives;
+                // everyone else gets the full-body world model. Harmless on prefabs that have no
+                // selector (the Runner today), and the selector itself falls back to the world
+                // model if this call never happens.
+                foreach (var selector in character.GetComponents<CharacterVisualSelector>())
+                {
+                    selector.Apply(isPlayer);
+                }
+
                 if (isPlayer)
                 {
                     var brain = character.gameObject.AddComponent<PlayerBrain>();

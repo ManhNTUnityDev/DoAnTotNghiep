@@ -40,6 +40,9 @@ namespace ChaseGame.Match
         [SerializeField] private GameObject activeBuffIndicator;
 
         [Header("Aiming & Shortcuts")]
+        [Tooltip("Snap the shot to a nearby runner. Ignored while the player is in first person: " +
+                 "the assist works on the horizontal plane only, so it would throw away the " +
+                 "player's vertical aim and bend the egg away from the crosshair.")]
         [SerializeField] private bool enableChaserAimAssist = true;
         [SerializeField] private float aimAssistAngle = 40f;
         [SerializeField] private float aimAssistRange = 8f;
@@ -143,6 +146,37 @@ namespace ChaseGame.Match
                 : remainingSeconds.ToString("0.0");
         }
 
+        private bool IsFirstPersonActive()
+        {
+            if (player == null)
+            {
+                return false;
+            }
+
+            var view = player.GetComponent<ChaseGame.Infrastructure.FirstPersonView>();
+            return view != null && view.IsActive;
+        }
+
+        /// <summary>
+        /// Pure helper: the direction the egg should fly, taken straight from where the player is
+        /// looking - vertical component included, so looking up or down actually aims up or down.
+        /// Falls back to the body's facing when there is no camera to read.
+        /// </summary>
+        public static Vector3 ComputeLookAim(Vector3 cameraForward, Vector3 bodyForward)
+        {
+            if (cameraForward.sqrMagnitude > 1e-4f)
+            {
+                return cameraForward.normalized;
+            }
+
+            if (bodyForward.sqrMagnitude > 1e-4f)
+            {
+                return bodyForward.normalized;
+            }
+
+            return Vector3.forward;
+        }
+
         /// <summary>
         /// Pure helper: chooses the best planar aim direction for a Chaser shot,
         /// snapping to the nearest free runner within the aim-assist cone (or close-range 360°).
@@ -223,11 +257,10 @@ namespace ChaseGame.Match
             }
 
             Vector3 aim = ResolveAimDirection();
-            if (player.Team == Team.Chaser && abilityIndex == 0 && aim.sqrMagnitude > 1e-4f)
-            {
-                player.transform.rotation = Quaternion.LookRotation(aim, Vector3.up);
-            }
 
+            // No rotation snap here any more. In first person FirstPersonView owns the body's yaw
+            // and the aim already comes from the camera, so the two agree by construction - and
+            // writing the rotation from here would fight the view driver for one frame.
             player.UseAbility(abilityIndex, aim);
             RefreshVisuals();
         }
@@ -241,23 +274,29 @@ namespace ChaseGame.Match
 
             if (player.Team == Team.Chaser && abilityIndex == 0)
             {
-                Vector3 referenceForward = player.transform.forward;
                 if (cameraTransform == null && Camera.main != null)
                 {
                     cameraTransform = Camera.main.transform;
                 }
 
-                if (cameraTransform != null)
-                {
-                    Vector3 camFlat = new Vector3(cameraTransform.forward.x, 0f, cameraTransform.forward.z);
-                    if (camFlat.sqrMagnitude > 1e-4f)
-                    {
-                        referenceForward = camFlat.normalized;
-                    }
-                }
+                Vector3 lookAim = ComputeLookAim(
+                    cameraTransform != null ? cameraTransform.forward : Vector3.zero,
+                    player.transform.forward);
 
-                if (enableChaserAimAssist && roster != null)
+                // Aim assist works on the horizontal plane by construction, so it cannot coexist
+                // with vertical aim. Rather than relying on a serialized checkbox - the four
+                // instances in Game.unity all have it ticked, and changing the field's default
+                // would not touch them - the decision follows the camera mode: in first person the
+                // egg goes exactly where the player looks, and if first person is ever switched
+                // off the assist comes back on its own.
+                if (enableChaserAimAssist && roster != null && !IsFirstPersonActive())
                 {
+                    Vector3 planarLook = new Vector3(lookAim.x, 0f, lookAim.z);
+                    if (planarLook.sqrMagnitude < 1e-4f)
+                    {
+                        planarLook = player.transform.forward;
+                    }
+
                     var targets = new List<Character>(roster.GetFreeRunners());
                     foreach (var lure in DecoyLure.Active)
                     {
@@ -269,13 +308,13 @@ namespace ChaseGame.Match
 
                     return ComputeChaserAimDirection(
                         player.transform.position,
-                        referenceForward,
+                        planarLook,
                         targets,
                         aimAssistRange,
                         aimAssistAngle);
                 }
 
-                return referenceForward;
+                return lookAim;
             }
 
             // Runner skills (SpeedBoost / Decoy): use current facing direction.

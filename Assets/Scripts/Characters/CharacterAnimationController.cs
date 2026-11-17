@@ -76,20 +76,26 @@ namespace ChaseGame.Characters
         {
             if (character == null) return;
 
-            // 1. Update Speed for Locomotion blend tree
+            // 1. Update Speed for Locomotion blend tree.
+            // Speed is NORMALIZED to 0..1 (current planar speed / current max speed), not raw m/s:
+            // every locomotion blend tree in the project is authored against 0..1 thresholds
+            // (NPC.controller uses 0 / 0.5 / 1 with m_MaxThreshold: 1). Feeding raw m/s pinned
+            // every character to its top clip and made the walk clips dead code.
             if (iMovement != null && movement != null)
             {
-                // Assuming max speed is roughly BaseSpeed * multiplier
-                // We can just use the controller's actual velocity magnitude or the movement's desired speed
-                // To keep it simple and independent of physics update rate, we use SpeedMultiplier * BaseSpeed approx
-                // However, the best way to get velocity is from CharacterController if attached.
                 var cc = character.GetComponent<CharacterController>();
-                float currentSpeed = cc != null ? cc.velocity.magnitude : 0f;
-                
+
                 // If it's a NavMeshAgent based movement (Runner AI often uses MoveTo), 
                 // the velocity might be from NavMeshAgent. Let's use the local plane velocity.
                 Vector3 horizontalVelocity = cc != null ? new Vector3(cc.velocity.x, 0, cc.velocity.z) : Vector3.zero;
-                animator.SetFloat(SpeedHash, horizontalVelocity.magnitude, 0.1f, Time.deltaTime);
+
+                // MaxSpeed already includes the SpeedBoost multiplier, so a boosted character does
+                // not jump straight to 1: the clip keeps matching leg speed relative to the body.
+                animator.SetFloat(
+                    SpeedHash,
+                    NormalizeSpeed(horizontalVelocity.magnitude, movement.MaxSpeed),
+                    0.1f,
+                    Time.deltaTime);
             }
 
             // 2. Update Capture State (Jailed) — drives the caged idle pose.
@@ -99,12 +105,43 @@ namespace ChaseGame.Characters
             }
         }
 
+        /// <summary>Raised by the footstep AnimationEvent; a footstep sound can hook on here.</summary>
+        public event System.Action OnFootstep;
+
+        /// <summary>
+        /// Receiver for the "PlayFootstep" AnimationEvent baked into Armature_Chic_FPP_Walk.
+        /// Unity delivers animation events only to components sitting on the Animator's own
+        /// GameObject, which is exactly where this component lives on both visual prefabs.
+        ///
+        /// Nothing in the project defined this method, which went unnoticed for as long as the
+        /// chaser had no Animator Controller at all - the clip never played, so the event never
+        /// fired. Now that it plays, Unity logged "has no receiver!" on every single step.
+        /// </summary>
+        public void PlayFootstep()
+        {
+            OnFootstep?.Invoke();
+        }
+
+        // Pure helper: current planar speed as a 0..1 fraction of the character's current top speed.
+        public static float NormalizeSpeed(float planarSpeed, float maxSpeed)
+        {
+            if (maxSpeed <= 0.01f)
+            {
+                return 0f;
+            }
+
+            return Mathf.Clamp01(planarSpeed / maxSpeed);
+        }
+
         private void HandleAbilityUsed(int abilityId)
         {
-            // animator.SetInteger(AbilityIDHash, abilityId);
-            // animator.SetTrigger(OnAbilityHash);
-
-            Debug.Log("[Character Animator] Handle Ability Used");
+            // ResetTrigger first: abilities with no clip of their own (Chaser AbilityID 1 =
+            // SpeedBoost, Runner AbilityID 0 = SpeedBoost) set OnAbility with no transition to
+            // consume it, so the trigger stays latched and would fire at the wrong moment on the
+            // NEXT ability whose AbilityID does have a transition.
+            animator.ResetTrigger(OnAbilityHash);
+            animator.SetInteger(AbilityIDHash, abilityId);
+            animator.SetTrigger(OnAbilityHash);
         }
     }
 }
