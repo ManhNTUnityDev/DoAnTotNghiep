@@ -43,13 +43,24 @@ namespace ChaseGame.EditorTools
         // Gun is component 0 in GetComponents<IAbility>() order on ChaserCharacter.
         private const int GunAbilityId = 0;
 
+        // First-person view model shoulder overrides (see 2026-11-18-chaser-wing-attachment-design.md):
+        // the shared clips omit shoulder.L/R localPosition and localRotation curves so the world
+        // model keeps the FBX bind pose (wings attached to mid-torso), while the FPP prefab holds
+        // the viewmodel offset and upward rotation that frame the wings inside the FPP camera.
+        private const string ShoulderLeftPath = "Armature/Bone/spine/spine.001/spine.002/shoulder.L";
+        private const string ShoulderRightPath = "Armature/Bone/spine/spine.001/spine.002/shoulder.R";
+        private static readonly Vector3 FppShoulderLeftPos = new Vector3(-0.1025f, 0.1457f, 0.2785f);
+        private static readonly Vector3 FppShoulderRightPos = new Vector3(0.1025f, 0.1457f, 0.2785f);
+        private static readonly Quaternion FppShoulderLeftRot = new Quaternion(-0.2167198f, 0.9318815f, 0.05396045f, -0.28588f);
+        private static readonly Quaternion FppShoulderRightRot = new Quaternion(0.2167198f, 0.9318815f, 0.05396045f, 0.28588f);
+
         [MenuItem("ChaseGame/Rebuild Chaser Visuals")]
         public static void Run()
         {
             EnsureMainRigAvatar();
             var controller = BuildController();
-            var fpp = BuildVisualPrefab(FppRigPath, FppVisualPrefabPath, controller);
-            var world = BuildVisualPrefab(MainRigPath, WorldVisualPrefabPath, controller);
+            var fpp = BuildVisualPrefab(FppRigPath, FppVisualPrefabPath, controller, applyFppShoulderOffset: true);
+            var world = BuildVisualPrefab(MainRigPath, WorldVisualPrefabPath, controller, applyFppShoulderOffset: false);
             RewireChaserCharacter(fpp, world);
 
             AssetDatabase.SaveAssets();
@@ -151,7 +162,11 @@ namespace ChaseGame.EditorTools
             return controller;
         }
 
-        private static GameObject BuildVisualPrefab(string rigPath, string outPath, AnimatorController controller)
+        private static GameObject BuildVisualPrefab(
+            string rigPath,
+            string outPath,
+            AnimatorController controller,
+            bool applyFppShoulderOffset)
         {
             var rig = Load<GameObject>(rigPath);
             EnsureAssetFolder(outPath);
@@ -162,6 +177,22 @@ namespace ChaseGame.EditorTools
                 instance.name = System.IO.Path.GetFileNameWithoutExtension(outPath);
                 instance.transform.localPosition = Vector3.zero;
                 instance.transform.localRotation = Quaternion.identity;
+
+                if (applyFppShoulderOffset)
+                {
+                    var shoulderL = instance.transform.Find(ShoulderLeftPath);
+                    var shoulderR = instance.transform.Find(ShoulderRightPath);
+                    if (shoulderL != null)
+                    {
+                        shoulderL.localPosition = FppShoulderLeftPos;
+                        shoulderL.localRotation = Quaternion.Normalize(FppShoulderLeftRot);
+                    }
+                    if (shoulderR != null)
+                    {
+                        shoulderR.localPosition = FppShoulderRightPos;
+                        shoulderR.localRotation = Quaternion.Normalize(FppShoulderRightRot);
+                    }
+                }
 
                 var animator = instance.GetComponent<Animator>();
                 if (animator == null)
