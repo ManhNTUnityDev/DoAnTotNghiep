@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
 using DG.Tweening;
+using ChaseGame.Infrastructure;
 
 public class LoadingBar : MonoBehaviour
 {
@@ -11,7 +12,6 @@ public class LoadingBar : MonoBehaviour
     private AsyncOperation asyncOperation;
     
     private const float LoadingTime = 3f;
-    private const string GamePlaySceneName = "Game";
 
     private void Start()
     {
@@ -22,7 +22,7 @@ public class LoadingBar : MonoBehaviour
     {
         yield return null;
 
-        asyncOperation = SceneManager.LoadSceneAsync(GamePlaySceneName);
+        asyncOperation = SceneManager.LoadSceneAsync(SceneNames.Menu);
         asyncOperation.allowSceneActivation = false;
 
         loadingFill.DOFillAmount(1, LoadingTime).SetEase(Ease.Linear).OnComplete(() =>

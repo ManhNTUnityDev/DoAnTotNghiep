@@ -2,9 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer;
 using ChaseGame.Characters;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using ChaseGame.Infrastructure;
 
 namespace ChaseGame.Match
 {
@@ -116,7 +114,7 @@ namespace ChaseGame.Match
             {
                 endView.Hide();
                 endView.ReplayClicked += Replay;
-                endView.QuitClicked += Quit;
+                endView.MenuClicked += ReturnToMenu;
             }
 
             if (hud != null)
@@ -124,7 +122,7 @@ namespace ChaseGame.Match
                 hud.PauseClicked += Pause;
                 hud.ResumeClicked += Resume;
                 hud.ReplayClicked += Replay;
-                hud.QuitClicked += Quit;
+                hud.MenuClicked += ReturnToMenu;
             }
         }
 
@@ -261,22 +259,26 @@ namespace ChaseGame.Match
             }
         }
 
-        public void Replay()
+        /// <summary>
+        /// Must run before any scene load out of the match: a paused or ended match leaves
+        /// Time.timeScale at 0, and timeScale survives scene loads.
+        /// </summary>
+        public void PrepareSceneExit()
         {
             isPaused = false;
-            Time.timeScale = 1f; // MUST reset before load — timeScale survives scene loads
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            Time.timeScale = 1f;
         }
 
-        public void Quit()
+        public void Replay()
         {
-            isPaused = false;
-            Time.timeScale = 1f; // don't leave a frozen clock for the next play session
-#if UNITY_EDITOR
-            EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
+            PrepareSceneExit();
+            SceneManager.LoadScene(SceneNames.Game);
+        }
+
+        public void ReturnToMenu()
+        {
+            PrepareSceneExit();
+            SceneManager.LoadScene(SceneNames.Menu);
         }
     }
 }

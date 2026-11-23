@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace ChaseGame.Match
 {
-    // End screen: result text + Chơi lại / Thoát buttons. Hidden until the match ends.
+    // End screen: result text + Chơi lại / Về Menu buttons. Hidden until the match ends.
     public sealed class MatchEndView : MonoBehaviour
     {
         [SerializeField] private GameObject panel;      // the end overlay, inactive at start
@@ -15,12 +15,12 @@ namespace ChaseGame.Match
         [SerializeField] private Color loseColor = new Color(0.85f, 0.25f, 0.25f);
 
         public event Action ReplayClicked;
-        public event Action QuitClicked;
+        public event Action MenuClicked;
 
         private void Awake()
         {
             if (replayButton != null) replayButton.onClick.AddListener(() => ReplayClicked?.Invoke());
-            if (quitButton != null) quitButton.onClick.AddListener(() => QuitClicked?.Invoke());
+            if (quitButton != null) quitButton.onClick.AddListener(() => MenuClicked?.Invoke());
             Hide();
         }
 

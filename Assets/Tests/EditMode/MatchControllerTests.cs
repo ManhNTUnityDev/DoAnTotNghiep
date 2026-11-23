@@ -14,19 +14,23 @@ namespace ChaseGame.Tests
         }
 
         [Test]
-        public void Quit_ResetsTimeScaleToOne()
+        public void PrepareSceneExit_ResetsTimeScaleToOne()
         {
-            // A match ends with Time.timeScale = 0 (frozen). Quitting must restore it,
-            // else the next editor play session inherits timeScale 0 and stays frozen.
+            // A match ends (or pauses) with Time.timeScale = 0. Leaving the scene must restore it,
+            // else the Menu / next match inherits timeScale 0 and stays frozen.
+            // (SceneManager.LoadScene throws in EditMode, so the load itself is not unit-tested.)
             var go = new GameObject("MatchControllerUnderTest");
-            var mc = go.AddComponent<MatchController>();
-
-            Time.timeScale = 0f;
-            mc.Quit();
-
-            Assert.AreEqual(1f, Time.timeScale);
-
-            Object.DestroyImmediate(go);
+            try
+            {
+                var mc = go.AddComponent<MatchController>();
+                Time.timeScale = 0f;
+                mc.PrepareSceneExit();
+                Assert.AreEqual(1f, Time.timeScale);
+            }
+            finally
+            {
+                Object.DestroyImmediate(go);
+            }
         }
 
         [Test]

@@ -51,7 +51,7 @@ namespace ChaseGame.Match
         public event Action PauseClicked;
         public event Action ResumeClicked;
         public event Action ReplayClicked;
-        public event Action QuitClicked;
+        public event Action MenuClicked;
 
         private Character boundPlayer;
         private string lastCenterCountdownLabel = string.Empty;
@@ -61,7 +61,7 @@ namespace ChaseGame.Match
             if (pauseButton != null) pauseButton.onClick.AddListener(() => PauseClicked?.Invoke());
             if (resumeButton != null) resumeButton.onClick.AddListener(() => ResumeClicked?.Invoke());
             if (pauseReplayButton != null) pauseReplayButton.onClick.AddListener(() => ReplayClicked?.Invoke());
-            if (pauseQuitButton != null) pauseQuitButton.onClick.AddListener(() => QuitClicked?.Invoke());
+            if (pauseQuitButton != null) pauseQuitButton.onClick.AddListener(() => MenuClicked?.Invoke());
 
             if (centerCountdownText != null)
             {
