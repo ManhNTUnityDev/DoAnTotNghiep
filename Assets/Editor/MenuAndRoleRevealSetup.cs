@@ -146,19 +146,35 @@ namespace ChaseGame.Editor
                 return;
             }
 
-            var canvas = hud.GetComponentInParent<Canvas>(true);
-            Transform parent = canvas != null ? canvas.rootCanvas.transform : hud.transform;
+            var hudSo = new SerializedObject(hud);
 
-            var existing = parent.Find(RoleRevealCardName);
-            if (existing != null)
+            // The card must render BELOW the pause dialog (pausing during the reveal is allowed),
+            // so it goes right before PausePanel among its siblings. Without a pause panel,
+            // fall back to the top of the root canvas.
+            var pausePanel = hudSo.FindProperty("pausePanel").objectReferenceValue as GameObject;
+            var canvas = hud.GetComponentInParent<Canvas>(true);
+            Transform parent = pausePanel != null && pausePanel.transform.parent != null
+                ? pausePanel.transform.parent
+                : canvas != null ? canvas.rootCanvas.transform : hud.transform;
+
+            // Remove any card from a previous run, wherever it was placed.
+            foreach (var old in hud.transform.root.GetComponentsInChildren<Transform>(true)
+                         .Where(t => t.name == RoleRevealCardName).ToArray())
             {
-                Object.DestroyImmediate(existing.gameObject);
+                Object.DestroyImmediate(old.gameObject);
             }
 
             var card = CreateImage(RoleRevealCardName, parent, new Color(0.06f, 0.18f, 0.24f, 0.82f));
             card.raycastTarget = false;
             Place(card.rectTransform, new Vector2(0.5f, 0.55f), new Vector2(900, 320));
-            card.transform.SetAsLastSibling();
+            if (pausePanel != null && pausePanel.transform.parent == parent)
+            {
+                card.transform.SetSiblingIndex(pausePanel.transform.GetSiblingIndex()); // pause panel shifts up, stays on top
+            }
+            else
+            {
+                card.transform.SetAsLastSibling();
+            }
 
             var title = CreateText("Title", card.transform, "BẠN LÀ NGƯỜI", 96, Color.white, FontStyle.Bold);
             title.raycastTarget = false;
@@ -168,7 +184,7 @@ namespace ChaseGame.Editor
             Place(subtitle.rectTransform, new Vector2(0.5f, 0.27f), new Vector2(860, 90));
             card.gameObject.SetActive(false);
 
-            var hudSo = new SerializedObject(hud);
+            hudSo.Update();
             hudSo.FindProperty("roleRevealPanel").objectReferenceValue = card.gameObject;
             hudSo.FindProperty("roleRevealBg").objectReferenceValue = card;
             hudSo.FindProperty("roleRevealTitleText").objectReferenceValue = title;
