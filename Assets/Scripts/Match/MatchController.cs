@@ -6,12 +6,16 @@ using ChaseGame.Infrastructure;
 
 namespace ChaseGame.Match
 {
-    // Match lifecycle glue: owns the pre-match head-start countdown (Runners flee while
+    // Match lifecycle glue: shows the role-reveal card (everyone locked), then owns the pre-match head-start countdown (Runners flee while
     // Chasers are locked, with a 3-2-1-READY center countdown for both roles), then ticks
     // the main match clock, asks MatchEvaluator for the verdict every frame, freezes on end,
     // and drives the HUD + end views.
     public sealed class MatchController : MonoBehaviour
     {
+        [Header("Role Reveal Settings")]
+        [Tooltip("Seconds the 'BẠN LÀ GÀ / BẠN LÀ NGƯỜI' card stays up before the head-start. Everyone is locked meanwhile. Set to 0 to skip.")]
+        [SerializeField] private float roleRevealDurationSeconds = 2.5f;
+
         [Header("Lobby / Head-Start Settings")]
         [Tooltip("Seconds Runners can run ahead while Chasers are locked at spawn (default 10s). Set to 0 to skip.")]
         [SerializeField] private float headStartDurationSeconds = 10f;
@@ -28,6 +32,7 @@ namespace ChaseGame.Match
         private ITeamRoster roster;
         private MatchEvaluator evaluator;
 
+        private float roleRevealRemaining;
         private float headStartRemaining;
         private float readyDisplayRemaining;
         private float timeRemaining;
@@ -40,6 +45,12 @@ namespace ChaseGame.Match
 
         public MatchPhase Phase => phase;
         public MatchState State => state;
+        public float RoleRevealDurationSeconds
+        {
+            get => roleRevealDurationSeconds;
+            set => roleRevealDurationSeconds = Mathf.Max(0f, value);
+        }
+        public float RoleRevealRemaining => roleRevealRemaining;
         public float HeadStartDurationSeconds
         {
             get => headStartDurationSeconds;
@@ -64,9 +75,12 @@ namespace ChaseGame.Match
         public void InitializeMatch()
         {
             timeRemaining = matchDurationSeconds;
+            roleRevealRemaining = Mathf.Max(0f, roleRevealDurationSeconds);
             headStartRemaining = Mathf.Max(0f, headStartDurationSeconds);
             readyDisplayRemaining = 0f;
-            phase = headStartRemaining > 0f ? MatchPhase.HeadStart : MatchPhase.Playing;
+            phase = roleRevealRemaining > 0f
+                ? MatchPhase.RoleReveal
+                : headStartRemaining > 0f ? MatchPhase.HeadStart : MatchPhase.Playing;
             state = MatchState.Ongoing;
             hasAppliedInitialLocks = false;
             hasInitializedTimers = true;
@@ -102,6 +116,37 @@ namespace ChaseGame.Match
                     {
                         runner.IsActionLocked = false;
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Locks or unlocks every character on the roster, both teams.
+        /// Used during the role-reveal card so nobody moves before the head-start begins.
+        /// </summary>
+        public static void SetAllLocked(ITeamRoster teamRoster, bool locked)
+        {
+            if (teamRoster == null)
+            {
+                return;
+            }
+
+            SetLocked(teamRoster.Chasers, locked);
+            SetLocked(teamRoster.Runners, locked);
+        }
+
+        private static void SetLocked(System.Collections.Generic.IEnumerable<Character> characters, bool locked)
+        {
+            if (characters == null)
+            {
+                return;
+            }
+
+            foreach (var character in characters)
+            {
+                if (character != null)
+                {
+                    character.IsActionLocked = locked;
                 }
             }
         }
@@ -150,7 +195,14 @@ namespace ChaseGame.Match
 
             if (!hasAppliedInitialLocks && (roster.Chasers.Count > 0 || roster.Runners.Count > 0))
             {
-                SetHeadStartChaserLock(roster, phase == MatchPhase.HeadStart);
+                if (phase == MatchPhase.RoleReveal)
+                {
+                    SetAllLocked(roster, true);
+                }
+                else
+                {
+                    SetHeadStartChaserLock(roster, phase == MatchPhase.HeadStart);
+                }
                 hasAppliedInitialLocks = true;
             }
 
@@ -161,6 +213,41 @@ namespace ChaseGame.Match
             var free = roster.GetFreeRunners();
             int freeCount = free.Count;
             int total = roster.Runners.Count;
+
+            if (phase == MatchPhase.RoleReveal)
+            {
+                roleRevealRemaining -= deltaTime;
+
+                if (roleRevealRemaining > 0f)
+                {
+                    if (hud != null)
+                    {
+                        // Only show the card once we know which side the player is on.
+                        hud.RenderRoleReveal(player != null, playerTeam);
+                        hud.RenderHeadStart(false, 0f, playerTeam);
+                        hud.RenderCenterCountdown(string.Empty);
+                        hud.Render(timeRemaining, freeCount, total);
+                    }
+                    return;
+                }
+
+                // Card done: hand over to the head-start lock rules (or straight to play).
+                // Leftover delta is intentionally not carried into the head-start.
+                roleRevealRemaining = 0f;
+                hud?.RenderRoleReveal(false, playerTeam);
+                SetAllLocked(roster, false);
+
+                if (headStartRemaining > 0f)
+                {
+                    phase = MatchPhase.HeadStart;
+                    SetHeadStartChaserLock(roster, true);
+                    return;
+                }
+
+                phase = MatchPhase.Playing;
+                readyDisplayRemaining = Mathf.Max(0f, readyDisplayDurationSeconds);
+                return;
+            }
 
             if (phase == MatchPhase.HeadStart)
             {
@@ -248,6 +335,7 @@ namespace ChaseGame.Match
             phase = MatchPhase.Ended;
             isPaused = false;
             hud?.SetPaused(false);
+            hud?.RenderRoleReveal(false, Team.Runner);
             hud?.RenderHeadStart(false, 0f, Team.Runner);
             hud?.RenderCenterCountdown(string.Empty);
             Time.timeScale = 0f;

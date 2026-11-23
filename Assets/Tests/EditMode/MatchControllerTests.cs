@@ -76,6 +76,7 @@ namespace ChaseGame.Tests
                 roster.PlayerCharacter = runner;
 
                 var mc = mcGo.AddComponent<MatchController>();
+                mc.RoleRevealDurationSeconds = 0f; // this test covers head-start only
                 mc.HeadStartDurationSeconds = 10f;
                 mc.MatchDurationSeconds = 90f;
                 mc.Construct(roster, new MatchEvaluator());
@@ -126,6 +127,114 @@ namespace ChaseGame.Tests
             Assert.AreEqual("Bắt hết phe Người trước khi hết giờ!", MatchHudView.FormatRoleRevealSubtitle(Team.Chaser));
             Assert.AreEqual("BẠN LÀ NGƯỜI", MatchHudView.FormatRoleRevealTitle(Team.Runner));
             Assert.AreEqual("Trốn đến hết giờ!", MatchHudView.FormatRoleRevealSubtitle(Team.Runner));
+        }
+
+        private sealed class MatchRig : System.IDisposable
+        {
+            public readonly GameObject McGo = new GameObject("MatchController");
+            public readonly GameObject ChaserGo = new GameObject("Chaser");
+            public readonly GameObject RunnerGo = new GameObject("Runner");
+            public readonly Character Chaser;
+            public readonly Character Runner;
+            public readonly TeamRoster Roster = new TeamRoster();
+            public readonly MatchController Mc;
+
+            public MatchRig(float roleReveal, float headStart, bool populateRoster = true)
+            {
+                Chaser = ChaserGo.AddComponent<Character>();
+                Chaser.SetTeamForTests(Team.Chaser);
+                Runner = RunnerGo.AddComponent<Character>();
+                Runner.SetTeamForTests(Team.Runner);
+                if (populateRoster) Populate();
+
+                Mc = McGo.AddComponent<MatchController>();
+                Mc.RoleRevealDurationSeconds = roleReveal;
+                Mc.HeadStartDurationSeconds = headStart;
+                Mc.MatchDurationSeconds = 90f;
+                Mc.Construct(Roster, new MatchEvaluator());
+                Mc.InitializeMatch();
+            }
+
+            public void Populate()
+            {
+                Roster.Add(Chaser);
+                Roster.Add(Runner);
+                Roster.PlayerCharacter = Runner;
+            }
+
+            public void Dispose()
+            {
+                Object.DestroyImmediate(McGo);
+                Object.DestroyImmediate(ChaserGo);
+                Object.DestroyImmediate(RunnerGo);
+            }
+        }
+
+        [Test]
+        public void RoleReveal_LocksBothTeams_AndFreezesHeadStartAndClock()
+        {
+            using (var rig = new MatchRig(2.5f, 10f))
+            {
+                rig.Mc.Step(1f);
+                Assert.AreEqual(MatchPhase.RoleReveal, rig.Mc.Phase);
+                Assert.AreEqual(1.5f, rig.Mc.RoleRevealRemaining, 1e-3f);
+                Assert.AreEqual(10f, rig.Mc.HeadStartRemaining, 1e-3f);
+                Assert.AreEqual(90f, rig.Mc.TimeRemaining, 1e-3f);
+                Assert.IsTrue(rig.Chaser.IsActionLocked, "Chaser must be locked during role reveal.");
+                Assert.IsTrue(rig.Runner.IsActionLocked, "Runner must be locked during role reveal.");
+            }
+        }
+
+        [Test]
+        public void RoleReveal_Ends_ThenHeadStartLocksOnlyChasers()
+        {
+            using (var rig = new MatchRig(2.5f, 10f))
+            {
+                rig.Mc.Step(2.5f);
+                Assert.AreEqual(MatchPhase.HeadStart, rig.Mc.Phase);
+                Assert.AreEqual(10f, rig.Mc.HeadStartRemaining, 1e-3f);
+                Assert.IsTrue(rig.Chaser.IsActionLocked, "Chaser stays locked into the head-start.");
+                Assert.IsFalse(rig.Runner.IsActionLocked, "Runner is released when the head-start begins.");
+            }
+        }
+
+        [Test]
+        public void RoleRevealZero_StartsDirectlyInHeadStart()
+        {
+            using (var rig = new MatchRig(0f, 10f))
+            {
+                Assert.AreEqual(MatchPhase.HeadStart, rig.Mc.Phase);
+            }
+        }
+
+        [Test]
+        public void RoleReveal_PausedDoesNotAdvance()
+        {
+            using (var rig = new MatchRig(2.5f, 10f))
+            {
+                rig.Mc.Step(0f);
+                rig.Mc.Pause();
+                rig.Mc.Step(5f);
+                Assert.AreEqual(MatchPhase.RoleReveal, rig.Mc.Phase);
+                Assert.AreEqual(2.5f, rig.Mc.RoleRevealRemaining, 1e-3f);
+
+                rig.Mc.Resume();
+                rig.Mc.Step(2.5f);
+                Assert.AreEqual(MatchPhase.HeadStart, rig.Mc.Phase);
+            }
+        }
+
+        [Test]
+        public void RoleReveal_LocksCharactersThatSpawnAfterFirstStep()
+        {
+            using (var rig = new MatchRig(2.5f, 10f, populateRoster: false))
+            {
+                rig.Mc.Step(0.1f);
+                rig.Populate();
+                rig.Mc.Step(0.1f);
+                Assert.IsTrue(rig.Chaser.IsActionLocked);
+                Assert.IsTrue(rig.Runner.IsActionLocked);
+            }
         }
     }
 }
