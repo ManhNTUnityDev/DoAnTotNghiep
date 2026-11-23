@@ -19,5 +19,7 @@ namespace ChaseGame.AI.BehaviourTree
         public bool IsFleeing;           // runner: hysteresis flag to prevent ping-pong at threat boundary
         public bool IsClone;             // runner decoy clone: disables skills and diverges flee path
         public float CloneFleeAngleBias; // horizontal angle offset (degrees) so clone splits from real runner
+
+        public BehaviourId ActiveBehaviour; // what the NPC is doing now; set by the shared actions
     }
 }

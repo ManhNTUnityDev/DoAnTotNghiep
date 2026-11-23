@@ -1,74 +1,22 @@
-using UnityEngine;
+using ChaseGame.AI.Actions;
 using ChaseGame.AI.BehaviourTree;
 
 namespace ChaseGame.AI
 {
-    // Chaser behaviour (spec §8, chase + wander slice). Shooting/guarding branches
-    // are added in later phases (abilities, coordinator).
-    public sealed class ChaserAIBrain : AIBrain
+    // Behaviour Tree chaser: shoot when a target is in range and the gun is ready,
+    // otherwise chase a visible target, otherwise roam.
+    public sealed class ChaserAIBrain : BehaviourTreeBrain
     {
         protected override Node BuildTree()
         {
             return new Selector(
-                // Shoot: target in range and the gun is ready → fire (captures free runners).
                 new Sequence(
-                    new ConditionNode(CanShoot),
-                    new ActionNode(AimAndShoot)),
-                // Hunt: if perception found a free runner, move to it.
+                    new ConditionNode(ChaserActions.CanShoot),
+                    new ActionNode(ChaserActions.AimAndShoot)),
                 new Sequence(
-                    new ConditionNode(bb => bb.CurrentTarget != null),
-                    new ActionNode(ChaseTarget)),
-                // Otherwise roam.
-                new ActionNode(Wander));
-        }
-
-        private static bool CanShoot(Blackboard bb)
-        {
-            if (bb.CurrentTarget == null)
-            {
-                return false;
-            }
-
-            float range = bb.Config != null ? bb.Config.ShootRange : 8f;
-            Vector3 a = bb.Self.transform.position;
-            Vector3 b = bb.CurrentTarget.position;
-            float planar = PlanarDistance(a, b);
-
-            return planar <= range && bb.Self.IsAbilityReady(0);
-        }
-
-        private static NodeStatus AimAndShoot(Blackboard bb)
-        {
-            Vector3 targetPos = bb.CurrentTarget.position;
-            Vector3 dir = targetPos - bb.Self.transform.position;
-            dir.y = 0f;
-            Vector3 aim = dir.sqrMagnitude > 1e-4f ? dir.normalized : bb.Self.transform.forward;
-
-            // Keep pursuing and remember last known position while firing.
-            bb.Destination = targetPos;
-            bb.Self.MoveTo(targetPos);
-            bb.Self.UseAbility(0, aim);
-            return NodeStatus.Success;
-        }
-
-        private static NodeStatus ChaseTarget(Blackboard bb)
-        {
-            Vector3 targetPos = bb.CurrentTarget.position;
-            // Store target position in Destination so if sight is lost next tick,
-            // Wander smoothly finishes walking to the runner's last seen position
-            // instead of snapping 180° back to a stale pre-chase wander point.
-            bb.Destination = targetPos;
-
-            if (bb.Self.IsAbilityReady(1))
-            {
-                Vector3 dir = targetPos - bb.Self.transform.position;
-                dir.y = 0f;
-                Vector3 aim = dir.sqrMagnitude > 1e-4f ? dir.normalized : bb.Self.transform.forward;
-                bb.Self.UseAbility(1, aim); // SpeedBoost
-            }
-
-            bb.Self.MoveTo(targetPos);
-            return NodeStatus.Running;
+                    new ConditionNode(ChaserActions.HasTarget),
+                    new ActionNode(ChaserActions.ChaseTarget)),
+                new ActionNode(AIActions.Wander));
         }
     }
 }

@@ -4,6 +4,8 @@ namespace ChaseGame.AI.BehaviourTree
     {
         private readonly Node[] children;
 
+        public override System.Collections.Generic.IReadOnlyList<Node> Children => children;
+
         public Sequence(params Node[] children)
         {
             this.children = children;
