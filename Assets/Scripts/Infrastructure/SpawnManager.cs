@@ -34,6 +34,13 @@ namespace ChaseGame.Infrastructure
         // Pure: a coin flip decides which team the human plays.
         public static Team PickPlayerTeam(float roll) => roll < 0.5f ? Team.Chaser : Team.Runner;
 
+        public static BrainKind ResolveBrainKind(Team team, MatchSetupOptions options)
+            => team == Team.Chaser ? options.ChaserBrain : options.RunnerBrain;
+
+        // Slot 0 of the player's team is the human, unless the match has no human at all.
+        public static bool IsPlayerSlot(Team team, int index, Team playerTeam, MatchSetupOptions options)
+            => options.HasHumanPlayer && team == playerTeam && index == 0;
+
         public void Start()
         {
             Team playerTeam = PickPlayerTeam(Random.value);
@@ -89,7 +96,7 @@ namespace ChaseGame.Infrastructure
                     decoy.Configure(roster, settings.aiConfig);
                 }
 
-                bool isPlayer = team == playerTeam && i == 0;
+                bool isPlayer = IsPlayerSlot(team, i, playerTeam, MatchSetup.Effective);
 
                 // Keep the first-person view model only on the character the human drives;
                 // everyone else gets the full-body world model. Harmless on prefabs that have no
@@ -116,16 +123,8 @@ namespace ChaseGame.Infrastructure
 
         private void AttachAIBrain(Character character, Team team)
         {
-            if (team == Team.Chaser)
-            {
-                var brain = character.gameObject.AddComponent<ChaserAIBrain>();
-                brain.Initialize(character, roster, settings.aiConfig);
-            }
-            else
-            {
-                var brain = character.gameObject.AddComponent<RunnerAIBrain>();
-                brain.Initialize(character, roster, settings.aiConfig);
-            }
+            var brain = BrainFactory.Add(character.gameObject, team, ResolveBrainKind(team, MatchSetup.Effective));
+            brain.Initialize(character, roster, settings.aiConfig);
         }
     }
 }
