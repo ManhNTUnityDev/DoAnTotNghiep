@@ -7,8 +7,13 @@ using ChaseGame.AI;
 
 namespace ChaseGame.Tests
 {
+    [TestFixture(BrainKind.BehaviourTree)]
+    [TestFixture(BrainKind.Fsm)]
     public class RunnerAIBrainTests
     {
+        private readonly BrainKind kind;
+        public RunnerAIBrainTests(BrainKind kind) { this.kind = kind; }
+
         private readonly List<GameObject> spawned = new List<GameObject>();
         private AIConfig config;
 
@@ -23,7 +28,7 @@ namespace ChaseGame.Tests
             Object.DestroyImmediate(config);
         }
 
-        private (Character, SpyCharacterMovement, FakeCharacterAbilities, RunnerAIBrain) MakeRunner()
+        private (Character, SpyCharacterMovement, FakeCharacterAbilities, AIBrain) MakeRunner()
         {
             var go = new GameObject("Runner");
             spawned.Add(go);
@@ -34,7 +39,7 @@ namespace ChaseGame.Tests
             ch.SetMovementForTests(spy);
             var abilities = new FakeCharacterAbilities();
             ch.SetAbilitiesForTests(abilities);
-            var brain = go.AddComponent<RunnerAIBrain>();
+            var brain = BrainFactory.Add(go, Team.Runner, kind);
             brain.Initialize(ch, new TeamRoster(), config);
             return (ch, spy, abilities, brain);
         }
@@ -98,7 +103,7 @@ namespace ChaseGame.Tests
         public void CloneRunner_WhenThreatNear_FleesWithoutUsingSkillsAndDivergesDirection()
         {
             var (ch, spy, abilities, brain) = MakeRunner();
-            brain.ConfigureAsClone(Vector3.forward, fleeAngleBias: 60f);
+            ((IRunnerCloneBrain)brain).ConfigureAsClone(Vector3.forward, fleeAngleBias: 60f);
             int callsBefore = spy.MoveToCallCount;
 
             var threat = new GameObject("Chaser");
@@ -126,6 +131,7 @@ namespace ChaseGame.Tests
             runner.SetTeamForTests(Team.Runner);
             roster.Add(runner);
 
+            BrainFactory.Add(runnerGo, Team.Runner, kind).Initialize(runner, roster, config);
             runnerGo.AddComponent<ChaseGame.Abilities.SpeedBoost>();
             var decoy = runnerGo.AddComponent<ChaseGame.Abilities.Decoy>();
             decoy.Configure(roster, config);
@@ -144,9 +150,11 @@ namespace ChaseGame.Tests
             Assert.AreEqual(1, roster.Runners.Count, "Clone must not be added to TeamRoster.Runners");
 
             // 3. Has RunnerAIBrain in clone mode, and cannot use abilities or be captured
-            var cloneBrain = decoy.ActiveClone.GetComponent<RunnerAIBrain>();
+            var cloneBrain = decoy.ActiveClone.GetComponent<IRunnerCloneBrain>();
             Assert.IsNotNull(cloneBrain);
             Assert.IsTrue(cloneBrain.IsClone);
+            Assert.AreEqual(kind, BrainFactory.KindOf(decoy.ActiveClone.gameObject), "clone uses the spawner's brain kind");
+            Assert.AreEqual(1, decoy.ActiveClone.GetComponents<AIBrain>().Length, "exactly one AI brain on the clone");
 
             var cloneChar = decoy.ActiveClone.GetComponent<Character>();
             Assert.IsNotNull(cloneChar);
@@ -157,6 +165,47 @@ namespace ChaseGame.Tests
             // 4. Dismiss immediately removes and destroys the clone
             decoy.ActiveClone.Dismiss();
             Assert.IsFalse(decoy.IsCloneActive);
+        }
+        [Test]
+        public void Flee_WithSkillsOnCooldown_StillMovesAway()
+        {
+            var (ch, spy, abilities, brain) = MakeRunner();
+            abilities.ReadyIds.Clear();
+            var threat = new GameObject("Chaser");
+            spawned.Add(threat);
+            threat.transform.position = new Vector3(3f, 0f, 0f);
+
+            brain.Blackboard.NearestThreat = threat.transform;
+            brain.TickForTests();
+
+            Assert.GreaterOrEqual(spy.MoveToCallCount, 1);
+            Assert.Less(spy.LastDestination.x, 0f);
+            Assert.AreEqual(0, abilities.Used.Count);
+            Assert.AreEqual(BehaviourId.Flee, brain.Blackboard.ActiveBehaviour);
+        }
+
+        [Test]
+        public void ThreatLeaves_ReturnsToWander()
+        {
+            var (ch, spy, abilities, brain) = MakeRunner();
+            var threat = new GameObject("Chaser");
+            spawned.Add(threat);
+            threat.transform.position = new Vector3(3f, 0f, 0f);
+            brain.Blackboard.NearestThreat = threat.transform;
+            brain.TickForTests();
+            Assert.AreEqual(BehaviourId.Flee, brain.Blackboard.ActiveBehaviour);
+
+            brain.Blackboard.NearestThreat = null;
+            brain.TickForTests();
+            Assert.AreEqual(BehaviourId.Wander, brain.Blackboard.ActiveBehaviour);
+        }
+
+        [Test]
+        public void NoNavMesh_WanderFails_NoException()
+        {
+            var (ch, spy, abilities, brain) = MakeRunner();
+            Assert.DoesNotThrow(brain.TickForTests);
+            Assert.AreEqual(BehaviourId.Wander, brain.Blackboard.ActiveBehaviour);
         }
     }
 }

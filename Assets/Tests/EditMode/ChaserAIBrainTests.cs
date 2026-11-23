@@ -6,8 +6,13 @@ using ChaseGame.AI;
 
 namespace ChaseGame.Tests
 {
+    [TestFixture(BrainKind.BehaviourTree)]
+    [TestFixture(BrainKind.Fsm)]
     public class ChaserAIBrainTests
     {
+        private readonly BrainKind kind;
+        public ChaserAIBrainTests(BrainKind kind) { this.kind = kind; }
+
         private readonly System.Collections.Generic.List<GameObject> spawned = new System.Collections.Generic.List<GameObject>();
         private AIConfig config;
 
@@ -25,7 +30,7 @@ namespace ChaseGame.Tests
             Object.DestroyImmediate(config);
         }
 
-        private (Character, SpyCharacterMovement, ChaserAIBrain) MakeChaser()
+        private (Character, SpyCharacterMovement, AIBrain) MakeChaser()
         {
             var go = new GameObject("Chaser");
             spawned.Add(go);
@@ -33,7 +38,7 @@ namespace ChaseGame.Tests
             ch.SetTeamForTests(Team.Chaser);
             var spy = new SpyCharacterMovement();
             ch.SetMovementForTests(spy);
-            var brain = go.AddComponent<ChaserAIBrain>();
+            var brain = BrainFactory.Add(go, Team.Chaser, kind);
             brain.Initialize(ch, new TeamRoster(), config);
             return (ch, spy, brain);
         }
@@ -106,6 +111,35 @@ namespace ChaseGame.Tests
             brain.TickForTests();
 
             CollectionAssert.Contains(abilities.Used, 1, "Chaser should trigger SpeedBoost (ability 1) while chasing");
+        }
+        [Test]
+        public void Chase_WithBoostOnCooldown_StillMovesToTarget()
+        {
+            var (ch, spy, brain) = MakeChaser();
+            var abilities = new FakeCharacterAbilities();
+            abilities.ReadyIds.Clear();
+            ch.SetAbilitiesForTests(abilities);
+            var target = new GameObject("Runner");
+            spawned.Add(target);
+            target.transform.position = new Vector3(10f, 0f, 0f);
+
+            brain.Blackboard.CurrentTarget = target.transform;
+            brain.TickForTests();
+
+            Assert.AreEqual(1, spy.MoveToCallCount);
+            Assert.AreEqual(new Vector3(10f, 0f, 0f), spy.LastDestination);
+            Assert.AreEqual(0, abilities.Used.Count);
+            Assert.AreEqual(BehaviourId.Chase, brain.Blackboard.ActiveBehaviour);
+        }
+
+        [Test]
+        public void NoNavMesh_WanderFails_NoException()
+        {
+            var (ch, spy, brain) = MakeChaser();
+            Assert.DoesNotThrow(brain.TickForTests);
+            Assert.DoesNotThrow(brain.TickForTests);
+            Assert.AreEqual(BehaviourId.Wander, brain.Blackboard.ActiveBehaviour);
+            Assert.AreEqual(0, spy.MoveToCallCount);
         }
     }
 }

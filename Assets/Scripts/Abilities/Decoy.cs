@@ -105,10 +105,14 @@ namespace ChaseGame.Abilities
             Vector3 cloneInitialDir = (Quaternion.Euler(0f, signedAngle, 0f) * baseDir).normalized;
             Quaternion spawnRot = Quaternion.LookRotation(cloneInitialDir, Vector3.up);
 
+            // The clone thinks with the same architecture as its spawner (BT for a human player),
+            // so a match measuring one architecture never mixes in the other through decoys.
+            BrainKind cloneKind = BrainFactory.KindOf(self.gameObject);
+
             GameObject cloneGo = Instantiate(self.gameObject, spawnPos, spawnRot);
             cloneGo.name = $"{self.gameObject.name}_DecoyClone";
 
-            SanitizeCloneComponents(self.gameObject, cloneGo, out var cloneCharacter);
+            SanitizeCloneComponents(self.gameObject, cloneGo, cloneKind, out var cloneCharacter, out var keptBrain);
 
             var lure = cloneGo.GetComponent<DecoyLure>();
             if (lure == null)
@@ -120,18 +124,14 @@ namespace ChaseGame.Abilities
 
             ResolveAIServices(self, out var resolvedRoster, out var resolvedConfig);
 
-            var cloneBrain = cloneGo.GetComponent<RunnerAIBrain>();
-            if (cloneBrain == null)
-            {
-                cloneBrain = cloneGo.AddComponent<RunnerAIBrain>();
-            }
+            AIBrain cloneBrain = keptBrain != null ? keptBrain : BrainFactory.Add(cloneGo, Team.Runner, cloneKind);
             cloneBrain.Initialize(cloneCharacter, resolvedRoster, resolvedConfig);
-            cloneBrain.ConfigureAsClone(cloneInitialDir, signedAngle);
+            ((IRunnerCloneBrain)cloneBrain).ConfigureAsClone(cloneInitialDir, signedAngle);
 
             Debug.Log($"[Decoy] Spawned runner clone '{cloneGo.name}' at {spawnPos} for {lifetime:0.0}s");
         }
 
-        private static void SanitizeCloneComponents(GameObject sourceGo, GameObject cloneGo, out Character cloneCharacter)
+        private static void SanitizeCloneComponents(GameObject sourceGo, GameObject cloneGo, BrainKind kind, out Character cloneCharacter, out AIBrain keptBrain)
         {
             // 1. Remove any human PlayerBrain so joystick/keyboard never drives the clone.
             foreach (var playerBrain in cloneGo.GetComponents<PlayerBrain>())
@@ -140,14 +140,18 @@ namespace ChaseGame.Abilities
                 DestroyComponentSafe(playerBrain);
             }
 
-            // 2. Remove any non-Runner AI brains if present.
+            // 2. Keep at most one runner brain of the requested kind; remove every other AI brain.
+            keptBrain = null;
             foreach (var aiBrain in cloneGo.GetComponents<AIBrain>())
             {
-                if (!(aiBrain is RunnerAIBrain))
+                if (keptBrain == null && aiBrain is IRunnerCloneBrain && aiBrain.Kind == kind)
                 {
-                    aiBrain.enabled = false;
-                    DestroyComponentSafe(aiBrain);
+                    keptBrain = aiBrain;
+                    continue;
                 }
+
+                aiBrain.enabled = false;
+                DestroyComponentSafe(aiBrain);
             }
 
             // 3. Disable and strip abilities on the clone so it cannot use SpeedBoost or spawn recursive clones.

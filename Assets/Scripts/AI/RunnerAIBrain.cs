@@ -7,7 +7,7 @@ namespace ChaseGame.AI
     // Behaviour Tree runner: flee threats (using escape skills), otherwise wander.
     // Rescue was dropped from the design — a jailed runner stays caged for the rest of
     // the match, so there is no branch that walks toward a jailed teammate.
-    public sealed class RunnerAIBrain : BehaviourTreeBrain
+    public sealed class RunnerAIBrain : BehaviourTreeBrain, IRunnerCloneBrain
     {
         public bool IsClone => Blackboard != null && Blackboard.IsClone;
 
