@@ -7,7 +7,7 @@ using ChaseGame.Characters;
 namespace ChaseGame.Match
 {
     // Always-visible HUD: countdown + free-runner tally + role indicator + role-specific
-    // skill buttons + pre-match head-start lobby banner + 3-2-1-READY center countdown + pause overlay.
+    // skill buttons + role-reveal card + pre-match head-start lobby banner + 3-2-1-READY center countdown + pause overlay.
     public sealed class MatchHudView : MonoBehaviour
     {
         public const string ReadyLabel = "READY!";
@@ -32,6 +32,13 @@ namespace ChaseGame.Match
         [SerializeField] private Color count2Color = new Color(1f, 0.54f, 0.2f);
         [SerializeField] private Color count1Color = new Color(1f, 0.32f, 0.32f);
         [SerializeField] private Color readyColor = new Color(0.35f, 0.95f, 0.55f);
+
+        [Header("Role Reveal Card")]
+        [Tooltip("Large centered card shown before the head-start telling the player which side they are on.")]
+        [SerializeField] private GameObject roleRevealPanel;
+        [SerializeField] private Image roleRevealBg;
+        [SerializeField] private Text roleRevealTitleText;
+        [SerializeField] private Text roleRevealSubtitleText;
 
         [Header("Role Action Panels")]
         [Tooltip("Optional parent panel for Chaser controls (Shoot button, crosshair). Enabled only when Player is Chaser.")]
@@ -69,6 +76,11 @@ namespace ChaseGame.Match
                 centerCountdownText.gameObject.SetActive(false);
             }
 
+            if (roleRevealPanel != null)
+            {
+                roleRevealPanel.SetActive(false);
+            }
+
             SetPaused(false);
         }
 
@@ -77,6 +89,11 @@ namespace ChaseGame.Match
             if (centerCountdownText != null)
             {
                 centerCountdownText.transform.DOKill();
+            }
+
+            if (roleRevealPanel != null)
+            {
+                roleRevealPanel.transform.DOKill();
             }
         }
 
@@ -138,6 +155,12 @@ namespace ChaseGame.Match
                 ? "Quan sát hướng chạy của Runner! Xuất phát sau: " + secs + "s"
                 : "Hãy tìm chỗ trốn! Chaser xuất phát sau: " + secs + "s";
         }
+
+        public static string FormatRoleRevealTitle(Team team)
+            => team == Team.Chaser ? "BẠN LÀ GÀ" : "BẠN LÀ NGƯỜI";
+
+        public static string FormatRoleRevealSubtitle(Team team)
+            => team == Team.Chaser ? "Bắt hết phe Người trước khi hết giờ!" : "Trốn đến hết giờ!";
 
         /// <summary>
         /// Pure helper: computes the big center countdown text ("3", "2", "1", "READY!", or "")
@@ -206,6 +229,51 @@ namespace ChaseGame.Match
                     ? new Color(0.22f, 0.08f, 0.06f, 0.82f)
                     : new Color(0.06f, 0.18f, 0.24f, 0.82f);
             }
+        }
+
+        public void RenderRoleReveal(bool active, Team playerTeam)
+        {
+            if (roleRevealPanel == null)
+            {
+                return;
+            }
+
+            if (roleRevealPanel.activeSelf == active)
+            {
+                return; // texts are fixed for the whole reveal; only react to show/hide edges
+            }
+
+            roleRevealPanel.SetActive(active);
+            Transform t = roleRevealPanel.transform;
+            t.DOKill();
+
+            if (!active)
+            {
+                t.localScale = Vector3.one;
+                return;
+            }
+
+            bool isChaser = playerTeam == Team.Chaser;
+            if (roleRevealTitleText != null)
+            {
+                roleRevealTitleText.text = FormatRoleRevealTitle(playerTeam);
+                roleRevealTitleText.color = isChaser ? chaserRoleColor : runnerRoleColor;
+            }
+
+            if (roleRevealSubtitleText != null)
+            {
+                roleRevealSubtitleText.text = FormatRoleRevealSubtitle(playerTeam);
+            }
+
+            if (roleRevealBg != null)
+            {
+                roleRevealBg.color = isChaser
+                    ? new Color(0.22f, 0.08f, 0.06f, 0.82f)
+                    : new Color(0.06f, 0.18f, 0.24f, 0.82f);
+            }
+
+            t.localScale = Vector3.one * 0.85f;
+            t.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
         }
 
         public void RenderCenterCountdown(string label)

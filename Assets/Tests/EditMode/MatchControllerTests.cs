@@ -118,5 +118,14 @@ namespace ChaseGame.Tests
             StringAssert.Contains("10s", MatchHudView.FormatHeadStartSubtitle(Team.Runner, 9.2f));
             StringAssert.Contains("10s", MatchHudView.FormatHeadStartSubtitle(Team.Chaser, 9.2f));
         }
+
+        [Test]
+        public void FormatRoleRevealLabels_MatchSpecCopy()
+        {
+            Assert.AreEqual("BẠN LÀ GÀ", MatchHudView.FormatRoleRevealTitle(Team.Chaser));
+            Assert.AreEqual("Bắt hết phe Người trước khi hết giờ!", MatchHudView.FormatRoleRevealSubtitle(Team.Chaser));
+            Assert.AreEqual("BẠN LÀ NGƯỜI", MatchHudView.FormatRoleRevealTitle(Team.Runner));
+            Assert.AreEqual("Trốn đến hết giờ!", MatchHudView.FormatRoleRevealSubtitle(Team.Runner));
+        }
     }
 }
