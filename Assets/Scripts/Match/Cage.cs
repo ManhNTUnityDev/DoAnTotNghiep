@@ -101,10 +101,13 @@ namespace ChaseGame.Match
             bar.name = "Bar";
 
             // The root BoxCollider does the blocking; per-bar colliders would only add cost.
+            // DestroyImmediate, not Destroy: the collider is brand new and owned by us, Destroy is
+            // forbidden outside Play mode (EditMode tests build cages), and a deferred Destroy would
+            // leave the bar colliders alive — and not ignored by Bind() — for the capture frame.
             var barCollider = bar.GetComponent<Collider>();
             if (barCollider != null)
             {
-                Destroy(barCollider);
+                DestroyImmediate(barCollider);
             }
 
             bar.transform.SetParent(parent, false);
