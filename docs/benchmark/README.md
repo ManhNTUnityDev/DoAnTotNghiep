@@ -72,3 +72,10 @@ nothing needs re-simulating.
 
 The scripts live in `.superpowers/sdd/2026-11-23-bt-vs-fsm-comparison/`. Matchup codes are
 `<chaser>_<runner>` with each side `bt` or `fsm`; all four runs share one seed list.
+
+## Còn lại
+
+Các việc chưa làm sau khi rà soát nhánh nằm ở
+`docs/superpowers/plans/2026-11-25-bt-vs-fsm-review-followup.md`. Đáng chú ý: ba cột ns/tick trong
+bảng chuỗi tăng dần đo cách viết điều kiện, không đo kiến trúc — xem §3.1 ở đó trước khi dùng
+chúng trong báo cáo.
