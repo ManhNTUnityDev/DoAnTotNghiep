@@ -1,0 +1,50 @@
+# BT vs FSM benchmark data
+
+Raw CSVs and generated summaries for the Behaviour Tree / FSM comparison. This file records
+how the data was produced; it draws no conclusions — those belong in the report.
+
+## Time scale: 3x (decided 2026-11-25)
+
+The simulation runs matches faster than real time. Before trusting the full pass, 10 `bt_bt`
+matches were run at 1x and 10 at 3x and the distributions compared.
+
+| metric | 1x | 3x | difference |
+| --- | --: | --: | --: |
+| chaser win % | 100 | 100 | 0 points |
+| all 4 runners caught | 10/10 | 10/10 | — |
+| median last capture (s) | 21.22 | 22.63 | +6.7% |
+| mean last capture (s) | 26.66 | 26.81 | +0.6% |
+| stdev last capture (s) | 17.80 | 14.48 | −3.32 |
+| median first capture (s) | 5.03 | 3.13 | −37.9% |
+| mean match duration (s) | 26.67 | 26.85 | +0.7% |
+| chaser switches/min | 172.3 | 178.8 | +3.8% |
+| runner switches/min | 40.4 | 50.2 | +24.4% |
+
+Gate (from the plan): accept 3x when chaser win % differs by at most 20 points and the median
+capture time by at most 15%. Both hold (0 points, +6.7%), so the full pass runs at **3x**.
+
+Caveats worth carrying into the report:
+
+- With n = 10 and a standard deviation about two thirds of the mean, the medians are noisy. The
+  means differ by 0.15 s, far inside the standard error, so on capture time the two distributions
+  are indistinguishable rather than merely close.
+- Decision rate is provably unaffected: with the 120 fps cap, 1x ticks every 15 frames and 3x
+  every 5 frames, both exactly the configured 8 Hz. (20x would drop to 6 Hz, which is why the
+  early 20x smoke numbers were not used.)
+- `runner switches/min` is 24% higher at 3x. Per-frame movement is 3x larger there, so runners
+  meet geometry differently. Treat switches/min as comparable **between matchups in one run**,
+  not as an absolute rate.
+- A seed does not reproduce a match: per-seed capture times differ entirely between the 1x and 3x
+  runs, as designed (tick phase and deltaTime vary). Seeds are for lookup; matchups are compared
+  as distributions.
+
+## Reproducing
+
+Editor: `ChaseGame/Benchmark/...` menu items. Editor closed: see
+`.superpowers/sdd/2026-11-23-bt-vs-fsm-comparison/run-benchmark.sh`.
+
+Summaries: `python tools/benchmark/summarize.py <csv> --out <dir>` (see `tools/benchmark/README.md`).
+
+## Runs
+
+- `baseline/` — 120 matches at 3x before the extension experiment; see `baseline/analysis.md`.

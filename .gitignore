@@ -23,3 +23,5 @@ obj
 
 # Benchmark run handoff (regenerated per run)
 Benchmark/pending-plan.json
+Benchmark/batch-plan.json
+Benchmark/results/

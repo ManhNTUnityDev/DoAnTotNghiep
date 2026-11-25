@@ -1,0 +1,11 @@
+index,matchup,seed,chaser_brain,runner_brain,winner,runners_caught,runners_total,first_capture_s,last_capture_s,match_duration_s,chaser_mean_decide_ms,chaser_max_decide_ms,chaser_mean_sense_ms,runner_mean_decide_ms,runner_max_decide_ms,runner_mean_sense_ms,chaser_changes_per_min,runner_changes_per_min,time_scale
+0,bt_bt,1000,bt,bt,ChasersWin,4,4,7.393,11.295,11.318,0.021,1.448,0.008,0.042,9.484,0.012,323.376,84.820,3.000
+1,bt_bt,1001,bt,bt,ChasersWin,4,4,3.325,16.083,16.110,0.016,1.304,0.010,0.016,1.528,0.007,178.775,29.796,3.000
+2,bt_bt,1002,bt,bt,ChasersWin,4,4,1.875,51.132,51.157,0.004,0.206,0.006,0.014,4.358,0.005,56.297,14.074,3.000
+3,bt_bt,1003,bt,bt,ChasersWin,4,4,2.250,23.065,23.090,0.011,0.270,0.008,0.027,3.601,0.005,155.913,77.957,3.000
+4,bt_bt,1004,bt,bt,ChasersWin,4,4,3.926,35.604,35.629,0.005,0.120,0.006,0.014,1.268,0.004,151.561,23.576,3.000
+5,bt_bt,1005,bt,bt,ChasersWin,4,4,1.700,17.903,18.011,0.008,0.272,0.007,0.019,3.760,0.004,116.596,43.307,3.000
+6,bt_bt,1006,bt,bt,ChasersWin,4,4,2.200,49.949,49.974,0.005,0.132,0.005,0.016,1.398,0.005,48.025,16.809,3.000
+7,bt_bt,1007,bt,bt,ChasersWin,4,4,9.775,28.547,28.572,0.010,0.155,0.007,0.018,1.389,0.005,153.296,50.399,3.000
+8,bt_bt,1008,bt,bt,ChasersWin,4,4,7.800,22.202,22.227,0.012,0.139,0.009,0.017,1.235,0.005,294.236,64.786,3.000
+9,bt_bt,1009,bt,bt,ChasersWin,4,4,2.926,12.359,12.384,0.016,0.210,0.012,0.022,1.268,0.006,310.083,96.901,3.000
