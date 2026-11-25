@@ -35,10 +35,13 @@ namespace ChaseGame.Tests
             return brain;
         }
 
+        // The counts are the figures the BT-vs-FSM comparison reports, so they are pinned
+        // here: a structural change must be a deliberate edit, not a silent drift.
         [Test]
-        public void CountNodes_ChaserTree_Is8()
+        public void CountNodes_ChaserTree_Is9()
         {
-            Assert.AreEqual(8, BehaviourTreeStats.CountNodes(Make<ChaserAIBrain>(Team.Chaser).Root));
+            // Selector + 2 Sequences + their 4 leaves + Search + Wander
+            Assert.AreEqual(9, BehaviourTreeStats.CountNodes(Make<ChaserAIBrain>(Team.Chaser).Root));
         }
 
         [Test]
