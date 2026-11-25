@@ -22,6 +22,7 @@ namespace ChaseGame.AI.BehaviourTree
         public float CloneFleeAngleBias; // horizontal angle offset (degrees) so clone splits from real runner
 
         public float Now;                // seconds, set by the host before each decision
+        public int SightMask;            // the Sensor's obstacle mask, so cover checks agree with perception
         public BehaviourId ActiveBehaviour; // what the NPC is doing now; set by the shared actions
 
         // Behaviour Tree chaser search memory. A tree re-decides from the root every tick and
