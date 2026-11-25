@@ -18,6 +18,10 @@ namespace ChaseGame.AI
 
         public abstract BrainKind Kind { get; }
 
+        // Measurements for the BT vs FSM comparison; never null, and TickForTests never records.
+        public DecisionStats Stats { get; } = new DecisionStats();
+
+        private readonly System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
         private Sensor sensor;
         private float tickInterval;
         private float accum;
@@ -71,8 +75,17 @@ namespace ChaseGame.AI
             }
 
             accum = 0f;
+
+            watch.Restart();
             sensor.Sense(Blackboard);
+            double senseMs = watch.Elapsed.TotalMilliseconds;
+
+            var before = Blackboard.ActiveBehaviour;
+            watch.Restart();
             Decide(Blackboard);
+            double decideMs = watch.Elapsed.TotalMilliseconds;
+
+            Stats.Record(senseMs, decideMs, before, Blackboard.ActiveBehaviour);
         }
 
         // Test seam: run one decision tick without the frame timer or sensor,
