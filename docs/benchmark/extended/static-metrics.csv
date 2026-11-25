@@ -1,0 +1,10 @@
+brain,team,kind,bt_nodes,fsm_states,fsm_transitions,loc
+ChaserAIBrain,chaser,bt,9,0,0,69
+ChaserFsmBrain,chaser,fsm,0,4,11,81
+RunnerAIBrain,runner,bt,9,0,0,45
+RunnerFsmBrain,runner,fsm,0,3,6,73
+AIActions,shared,-,0,0,0,89
+ChaserActions,shared,-,0,0,0,93
+RunnerActions,shared,-,0,0,0,166
+AIBrain,shared,-,0,0,0,76
+Blackboard,shared,-,0,0,0,27

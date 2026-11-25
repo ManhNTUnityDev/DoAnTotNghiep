@@ -1,0 +1,64 @@
+# Extension experiment — per-commit diffs
+
+One behaviour added per side (chaser: search where the target was lost; runner: hide
+behind obstacles). Shared code landed in its own commits first, so each brain's commit
+contains only that brain's decision code.
+
+## 8583d1f — feat(ai): shared search and cover helpers for the extension experiment
+```
+ Assets/Scripts/AI/AIBrain.cs                  |  1 +
+ Assets/Scripts/AI/AIConfig.cs                 | 14 ++++++
+ Assets/Scripts/AI/Actions/ChaserActions.cs    | 59 ++++++++++++++++++++++
+ Assets/Scripts/AI/Actions/RunnerActions.cs    | 72 +++++++++++++++++++++++++++
+ Assets/Scripts/AI/BehaviourTree/Blackboard.cs |  1 +
+ Assets/Scripts/AI/Sensor.cs                   | 23 +++++++--
+ Assets/Tests/EditMode/ChaserAIBrainTests.cs   | 71 ++++++++++++++++++++++++++
+ Assets/Tests/PlayMode/ChaserScenarioTests.cs  | 31 ++++++++++++
+ Assets/Tests/PlayMode/RunnerScenarioTests.cs  | 64 ++++++++++++++++++++++++
+ 9 files changed, 332 insertions(+), 4 deletions(-)
+```
+
+## 1d606dc — feat(ai): BT chaser searches where it lost the target
+```
+ Assets/Scripts/AI/BehaviourTree/Blackboard.cs      |  8 +++
+ Assets/Scripts/AI/ChaserAIBrain.cs                 | 70 +++++++++++++++++++++-
+ .../EditMode/BehaviourTreeIntrospectionTests.cs    |  7 ++-
+ 3 files changed, 81 insertions(+), 4 deletions(-)
+```
+
+## 778fada — feat(ai): FSM chaser searches where it lost the target
+```
+ Assets/Scripts/AI/Fsm/ChaserFsmBrain.cs     | 78 ++++++++++++++++++++++++++++-
+ Assets/Tests/EditMode/FsmBrainTableTests.cs |  8 +--
+ 2 files changed, 81 insertions(+), 5 deletions(-)
+```
+
+## b09c5fe — feat(ai): expose the sensor's obstacle mask on the blackboard
+```
+ Assets/Scripts/AI/AIBrain.cs                  | 2 ++
+ Assets/Scripts/AI/BehaviourTree/Blackboard.cs | 1 +
+ 2 files changed, 3 insertions(+)
+```
+
+## fa8fc37 — feat(ai): BT runner hides behind obstacles
+```
+ Assets/Scripts/AI/BehaviourTree/Blackboard.cs      |  4 +++
+ Assets/Scripts/AI/RunnerAIBrain.cs                 | 39 +++++++++++++++++++---
+ .../EditMode/BehaviourTreeIntrospectionTests.cs    |  6 ++--
+ 3 files changed, 43 insertions(+), 6 deletions(-)
+```
+
+## ae2bd87 — feat(ai): FSM runner hides behind obstacles
+```
+ Assets/Scripts/AI/Fsm/RunnerFsmBrain.cs     | 70 ++++++++++++++++++++++++++++-
+ Assets/Tests/EditMode/FsmBrainTableTests.cs |  6 +--
+ 2 files changed, 71 insertions(+), 5 deletions(-)
+```
+
+## Production code only (tests excluded)
+```
+1d606dc    2 files changed, 76 insertions(+), 2 deletions(-)
+778fada    1 file changed, 76 insertions(+), 2 deletions(-)
+fa8fc37    2 files changed, 39 insertions(+), 4 deletions(-)
+ae2bd87    1 file changed, 68 insertions(+), 2 deletions(-)
+```
