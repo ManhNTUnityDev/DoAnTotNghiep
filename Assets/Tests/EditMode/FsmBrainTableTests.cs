@@ -46,11 +46,11 @@ namespace ChaseGame.Tests
         }
 
         [Test]
-        public void RunnerFsm_Has2StatesAnd2Transitions()
+        public void RunnerFsm_Has3StatesAnd6Transitions()
         {
             var fsm = ((FsmBrain)Make(Team.Runner, BrainKind.Fsm)).Machine;
-            Assert.AreEqual(2, fsm.States.Count);
-            Assert.AreEqual(2, fsm.TransitionCount);
+            Assert.AreEqual(3, fsm.States.Count);
+            Assert.AreEqual(6, fsm.TransitionCount);
         }
 
         [Test]
