@@ -109,5 +109,69 @@ namespace ChaseGame.Tests.PlayMode
                 Assert.AreEqual(BehaviourId.Flee, brain.Blackboard.ActiveBehaviour, $"flickered at t={t:0.00}");
             }
         }
+        // --- extension experiment (R5) ---
+
+        [UnityTest]
+        public IEnumerator R5_WallNearby_EndsOutOfChaserSight()
+        {
+            arena.AddWall(new Vector3(4f, 1.5f, 0f), new Vector3(0.5f, 3f, 8f));
+            yield return arena.Bake();
+            var chaser = arena.MakePuppet("Chaser", Team.Chaser, new Vector3(0f, 0f, 0f));
+            var runner = arena.MakeBody("Runner", Team.Runner, new Vector3(3f, 0.2f, 0f));
+            arena.AttachBrain(runner, kind);
+
+            for (float t = 0f; t < 4f; t += Time.deltaTime) yield return null;
+
+            Vector3 chaserEye = chaser.transform.position + Vector3.up * 0.6f;
+            Vector3 runnerEye = runner.transform.position + Vector3.up * 0.6f;
+            Assert.IsFalse(Sensor.IsSightClear(chaserEye, runnerEye, ~0),
+                "runner should end up hidden behind the wall");
+        }
+
+        [UnityTest]
+        public IEnumerator ThreatNear_CoverAvailable_Hides()
+        {
+            arena.AddWall(new Vector3(4f, 1.5f, 0f), new Vector3(0.5f, 3f, 8f));
+            yield return arena.Bake();
+            arena.MakePuppet("Chaser", Team.Chaser, new Vector3(0f, 0f, 0f));
+            var runner = arena.MakeBody("Runner", Team.Runner, new Vector3(3f, 0.2f, 0f));
+            var brain = arena.AttachBrain(runner, kind);
+
+            for (float t = 0f; t < 2f && brain.Blackboard.ActiveBehaviour != BehaviourId.Hide; t += Time.deltaTime)
+                yield return null;
+
+            Assert.AreEqual(BehaviourId.Hide, brain.Blackboard.ActiveBehaviour);
+        }
+
+        [UnityTest]
+        public IEnumerator ThreatNear_NoCover_Flees()
+        {
+            yield return arena.Bake(); // open ground, nothing to hide behind
+            arena.MakePuppet("Chaser", Team.Chaser, new Vector3(-2f, 0f, 0f));
+            var runner = arena.MakeBody("Runner", Team.Runner, new Vector3(2f, 0.2f, 0f));
+            var brain = arena.AttachBrain(runner, kind);
+
+            yield return WaitForFirstDecision(brain);
+
+            Assert.AreEqual(BehaviourId.Flee, brain.Blackboard.ActiveBehaviour);
+        }
+
+        [UnityTest]
+        public IEnumerator Clone_NeverHides()
+        {
+            arena.AddWall(new Vector3(4f, 1.5f, 0f), new Vector3(0.5f, 3f, 8f));
+            yield return arena.Bake();
+            arena.MakePuppet("Chaser", Team.Chaser, new Vector3(0f, 0f, 0f));
+            var runner = arena.MakeBody("Runner", Team.Runner, new Vector3(3f, 0.2f, 0f));
+            var brain = arena.AttachBrain(runner, kind);
+            ((ChaseGame.AI.IRunnerCloneBrain)brain).ConfigureAsClone(Vector3.forward);
+
+            for (float t = 0f; t < 2f; t += Time.deltaTime)
+            {
+                yield return null;
+                Assert.AreNotEqual(BehaviourId.Hide, brain.Blackboard.ActiveBehaviour,
+                    "a decoy clone must keep drawing the chaser, never hide");
+            }
+        }
     }
 }

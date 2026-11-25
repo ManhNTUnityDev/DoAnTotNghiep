@@ -134,5 +134,77 @@ namespace ChaseGame.AI.Actions
 
             return bestPoint;
         }
+
+        // A reachable spot near the runner that the threat cannot see, and that is no closer to
+        // the threat than the runner already is. Candidates sit on a ring between half the
+        // radius and the radius; the nearest valid one wins, so the runner commits to the
+        // cheapest hiding place rather than sprinting across the map.
+        public static bool TryFindCoverPoint(
+            Vector3 self, Vector3 threat, float radius, int samples, int mask, out Vector3 point)
+        {
+            point = self;
+            if (samples <= 0 || radius <= 0f)
+            {
+                return false;
+            }
+
+            const float eye = 0.6f;
+            Vector3 threatEye = threat + Vector3.up * eye;
+            float currentGap = AIActions.PlanarDistance(self, threat);
+
+            bool found = false;
+            float bestDistance = float.MaxValue;
+
+            for (int i = 0; i < samples; i++)
+            {
+                float angle = 360f * i / samples;
+                float ring = Mathf.Lerp(radius * 0.5f, radius, (i % 2 == 0) ? 1f : 0.5f);
+                Vector3 candidate = self + Quaternion.Euler(0f, angle, 0f) * Vector3.forward * ring;
+
+                if (!NavMesh.SamplePosition(candidate, out var hit, 2.5f, NavMesh.AllAreas))
+                {
+                    continue;
+                }
+
+                if (AIActions.PlanarDistance(hit.position, threat) < currentGap)
+                {
+                    continue; // no safer than standing still
+                }
+
+                if (Sensor.IsSightClear(threatEye, hit.position + Vector3.up * eye, mask))
+                {
+                    continue; // the threat can still see it
+                }
+
+                float distance = AIActions.PlanarDistance(self, hit.position);
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    point = hit.position;
+                    found = true;
+                }
+            }
+
+            return found;
+        }
+
+        // Head for a hiding place, using escape skills on the way exactly as fleeing does.
+        public static NodeStatus TakeCover(Blackboard bb, Vector3 point)
+        {
+            bb.ActiveBehaviour = BehaviourId.Hide;
+            bb.Destination = null;
+
+            if (!bb.IsClone)
+            {
+                Vector3 away = bb.Self.transform.position - bb.NearestThreat.position;
+                away.y = 0f;
+                Vector3 dir = away.sqrMagnitude > 1e-4f ? away.normalized : bb.Self.transform.forward;
+                if (bb.Self.IsAbilityReady(0)) bb.Self.UseAbility(0, dir); // SpeedBoost
+                if (bb.Self.IsAbilityReady(1)) bb.Self.UseAbility(1, dir); // Decoy
+            }
+
+            bb.Self.MoveTo(point);
+            return NodeStatus.Running;
+        }
     }
 }

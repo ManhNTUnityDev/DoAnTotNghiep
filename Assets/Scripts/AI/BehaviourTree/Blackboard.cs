@@ -20,6 +20,7 @@ namespace ChaseGame.AI.BehaviourTree
         public bool IsClone;             // runner decoy clone: disables skills and diverges flee path
         public float CloneFleeAngleBias; // horizontal angle offset (degrees) so clone splits from real runner
 
+        public float Now;                // seconds, set by the host before each decision
         public BehaviourId ActiveBehaviour; // what the NPC is doing now; set by the shared actions
     }
 }

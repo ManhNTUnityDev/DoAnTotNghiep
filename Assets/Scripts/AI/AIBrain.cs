@@ -80,6 +80,7 @@ namespace ChaseGame.AI
             sensor.Sense(Blackboard);
             double senseMs = watch.Elapsed.TotalMilliseconds;
 
+            Blackboard.Now = Time.time;
             var before = Blackboard.ActiveBehaviour;
             watch.Restart();
             Decide(Blackboard);

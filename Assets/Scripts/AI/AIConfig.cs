@@ -11,10 +11,24 @@ namespace ChaseGame.AI
         [SerializeField] private float wanderRadius = 6f;
         [SerializeField] private float tickRateHz = 8f;
 
+        [Header("Chaser search (after losing a target)")]
+        [SerializeField] private float searchDurationSeconds = 6f;
+        [SerializeField] private int searchPointCount = 4;
+        [SerializeField] private float searchRadius = 4f;
+
+        [Header("Runner cover")]
+        [SerializeField] private float coverSearchRadius = 8f;
+        [SerializeField] private int coverSampleCount = 12;
+
         public float VisionRadius => visionRadius;
         public float ShootRange => shootRange;
         public float ThreatRadius => threatRadius;
         public float WanderRadius => wanderRadius;
         public float TickRateHz => tickRateHz;
+        public float SearchDurationSeconds => searchDurationSeconds;
+        public int SearchPointCount => searchPointCount;
+        public float SearchRadius => searchRadius;
+        public float CoverSearchRadius => coverSearchRadius;
+        public int CoverSampleCount => coverSampleCount;
     }
 }

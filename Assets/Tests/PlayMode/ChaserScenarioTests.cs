@@ -102,5 +102,36 @@ namespace ChaseGame.Tests.PlayMode
 
             Assert.Less(best, 1.5f, "chaser should reach the runner's last-seen point");
         }
+        // --- extension experiment (C5) ---
+
+        [UnityTest]
+        public IEnumerator C5_LostBehindWall_SearchesThenWanders()
+        {
+            arena.AddWall(new Vector3(0f, 1.5f, 0f), new Vector3(0.5f, 3f, 10f));
+            yield return arena.Bake();
+            var runner = arena.MakePuppet("Runner", Team.Runner, new Vector3(-2f, 0f, 6f));
+            var chaser = arena.MakeBody("Chaser", Team.Chaser, new Vector3(-6f, 0.2f, 0f));
+            var brain = arena.AttachBrain(chaser, kind);
+
+            for (float t = 0f; t < 1f && brain.Blackboard.ActiveBehaviour != BehaviourId.Chase; t += Time.deltaTime)
+                yield return null;
+            Assert.AreEqual(BehaviourId.Chase, brain.Blackboard.ActiveBehaviour, "sanity: chaser saw the runner");
+
+            runner.transform.position = new Vector3(14f, 0f, 14f); // far away and out of sight
+
+            var seen = new System.Collections.Generic.List<BehaviourId>();
+            for (float t = 0f; t < 10f; t += Time.deltaTime)
+            {
+                yield return null;
+                var b = brain.Blackboard.ActiveBehaviour;
+                if (seen.Count == 0 || seen[seen.Count - 1] != b) seen.Add(b);
+                if (seen.Contains(BehaviourId.Search) && b == BehaviourId.Wander) break;
+            }
+
+            int search = seen.IndexOf(BehaviourId.Search);
+            int wander = seen.LastIndexOf(BehaviourId.Wander);
+            Assert.Greater(search, -1, "chaser should search after losing the target; saw " + string.Join(",", seen));
+            Assert.Greater(wander, search, "search should give way to wander; saw " + string.Join(",", seen));
+        }
     }
 }

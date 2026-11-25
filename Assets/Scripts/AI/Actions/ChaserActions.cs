@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using ChaseGame.AI.BehaviourTree;
 
 namespace ChaseGame.AI.Actions
@@ -58,6 +60,63 @@ namespace ChaseGame.AI.Actions
             }
 
             bb.Self.MoveTo(targetPos);
+            return NodeStatus.Running;
+        }
+
+        // Points to sweep around where a target was lost: evenly spaced on a circle, each
+        // snapped to the NavMesh. Candidates off the mesh are dropped, so the list can be
+        // shorter than count — or empty when nothing around is reachable.
+        public static List<Vector3> GenerateSearchPoints(Vector3 center, int count, float radius)
+        {
+            var points = new List<Vector3>();
+            if (count <= 0 || radius <= 0f)
+            {
+                return points;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                float angle = 360f * i / count;
+                Vector3 candidate = center + Quaternion.Euler(0f, angle, 0f) * Vector3.forward * radius;
+                if (NavMesh.SamplePosition(candidate, out var hit, 2.5f, NavMesh.AllAreas))
+                {
+                    points.Add(hit.position);
+                }
+            }
+
+            return points;
+        }
+
+        // Walks the search points in order. Returns Success once the last one is reached,
+        // which is how a brain learns the sweep is over; Failure when there is nothing to sweep.
+        public static NodeStatus SearchStep(Blackboard bb, IReadOnlyList<Vector3> points, ref int index)
+        {
+            bb.ActiveBehaviour = BehaviourId.Search;
+
+            if (points == null || points.Count == 0)
+            {
+                return NodeStatus.Failure;
+            }
+
+            if (index >= points.Count)
+            {
+                return NodeStatus.Success;
+            }
+
+            Vector3 target = points[index];
+            if (AIActions.PlanarDistance(bb.Self.transform.position, target) <= 1.5f)
+            {
+                index++;
+                if (index >= points.Count)
+                {
+                    return NodeStatus.Success;
+                }
+
+                target = points[index];
+            }
+
+            bb.Destination = target;
+            bb.Self.MoveTo(target);
             return NodeStatus.Running;
         }
     }

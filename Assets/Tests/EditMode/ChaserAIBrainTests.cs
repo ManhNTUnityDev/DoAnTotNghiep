@@ -141,5 +141,76 @@ namespace ChaseGame.Tests
             Assert.AreEqual(BehaviourId.Wander, brain.Blackboard.ActiveBehaviour);
             Assert.AreEqual(0, spy.MoveToCallCount);
         }
+        // --- extension experiment: search where the target was lost (C5) ---
+
+        [Test]
+        public void TargetLost_WalksToLastSeenThenSearches()
+        {
+            var (ch, spy, brain) = MakeChaser();
+            var target = new GameObject("Runner");
+            spawned.Add(target);
+            target.transform.position = new Vector3(6f, 0f, 0f);
+
+            brain.Blackboard.Now = 100f;
+            brain.Blackboard.CurrentTarget = target.transform;
+            brain.TickForTests();
+            Assert.AreEqual(BehaviourId.Chase, brain.Blackboard.ActiveBehaviour);
+
+            // Sight lost: head for the last-seen point and enter Search, not Wander.
+            brain.Blackboard.CurrentTarget = null;
+            brain.Blackboard.Now = 100.2f;
+            brain.TickForTests();
+
+            Assert.AreEqual(BehaviourId.Search, brain.Blackboard.ActiveBehaviour);
+            Assert.AreEqual(new Vector3(6f, 0f, 0f), spy.LastDestination);
+        }
+
+        [Test]
+        public void SearchTimesOut_ReturnsToWander()
+        {
+            var (ch, spy, brain) = MakeChaser();
+            var target = new GameObject("Runner");
+            spawned.Add(target);
+            target.transform.position = new Vector3(6f, 0f, 0f);
+
+            brain.Blackboard.Now = 100f;
+            brain.Blackboard.CurrentTarget = target.transform;
+            brain.TickForTests();
+            brain.Blackboard.CurrentTarget = null;
+            brain.Blackboard.Now = 100.2f;
+            brain.TickForTests();
+            Assert.AreEqual(BehaviourId.Search, brain.Blackboard.ActiveBehaviour);
+
+            // Past searchDurationSeconds (6 s by default) the sweep is abandoned.
+            brain.Blackboard.Now = 100f + 6.5f;
+            brain.TickForTests();
+
+            Assert.AreEqual(BehaviourId.Wander, brain.Blackboard.ActiveBehaviour);
+        }
+
+        [Test]
+        public void TargetReappearsDuringSearch_Chases()
+        {
+            var (ch, spy, brain) = MakeChaser();
+            var target = new GameObject("Runner");
+            spawned.Add(target);
+            target.transform.position = new Vector3(6f, 0f, 0f);
+
+            brain.Blackboard.Now = 100f;
+            brain.Blackboard.CurrentTarget = target.transform;
+            brain.TickForTests();
+            brain.Blackboard.CurrentTarget = null;
+            brain.Blackboard.Now = 100.2f;
+            brain.TickForTests();
+            Assert.AreEqual(BehaviourId.Search, brain.Blackboard.ActiveBehaviour);
+
+            target.transform.position = new Vector3(9f, 0f, 1f);
+            brain.Blackboard.CurrentTarget = target.transform;
+            brain.Blackboard.Now = 100.4f;
+            brain.TickForTests();
+
+            Assert.AreEqual(BehaviourId.Chase, brain.Blackboard.ActiveBehaviour);
+            Assert.AreEqual(new Vector3(9f, 0f, 1f), spy.LastDestination);
+        }
     }
 }

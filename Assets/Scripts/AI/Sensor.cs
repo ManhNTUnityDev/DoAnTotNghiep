@@ -126,9 +126,22 @@ namespace ChaseGame.AI
             }
         }
 
+        public float EyeHeight => eyeHeight;
+
+        public int ObstacleMask => obstacleMask.value != 0 ? obstacleMask.value : ~0;
+
         private bool HasLineOfSight(Vector3 from, Vector3 targetPos)
+            => IsSightClear(from, targetPos + Vector3.up * eyeHeight, ObstacleMask);
+
+        /// <summary>
+        /// Whether map geometry leaves the line between two eye-height points clear. Characters
+        /// and decoy lures never block sight, so only the map itself can hide anything.
+        /// Shared with the runner's cover search, which asks the same question from the
+        /// threat's point of view.
+        /// </summary>
+        public static bool IsSightClear(Vector3 fromEye, Vector3 toEye, int mask)
         {
-            Vector3 to = (targetPos + Vector3.up * eyeHeight) - from;
+            Vector3 to = toEye - fromEye;
             float dist = to.magnitude;
             const float bodyClearance = 0.45f;
 
@@ -138,17 +151,19 @@ namespace ChaseGame.AI
             }
 
             Vector3 dir = to / dist;
-            int mask = obstacleMask.value != 0 ? obstacleMask.value : ~0;
+            if (mask == 0)
+            {
+                mask = ~0;
+            }
 
             if (Physics.Raycast(
-                from + dir * bodyClearance,
+                fromEye + dir * bodyClearance,
                 dir,
                 out var hit,
                 dist - bodyClearance * 2f,
                 mask,
                 QueryTriggerInteraction.Ignore))
             {
-                // Ignore characters and decoy lures so only actual map geometry blocks sight.
                 if (hit.collider.GetComponentInParent<Character>() != null ||
                     hit.collider.GetComponentInParent<DecoyLure>() != null)
                 {
