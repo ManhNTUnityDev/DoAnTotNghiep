@@ -20,3 +20,6 @@ Game.slnx
 *.sln
 obj
 .idea
+
+# Benchmark run handoff (regenerated per run)
+Benchmark/pending-plan.json

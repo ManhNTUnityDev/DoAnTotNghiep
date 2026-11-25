@@ -65,6 +65,12 @@ namespace ChaseGame.Match
         public float ReadyDisplayRemaining => readyDisplayRemaining;
         public float TimeRemaining => timeRemaining;
 
+        /// <summary>
+        /// Raised once, after the match is frozen and the end panel is shown. The benchmark
+        /// simulation listens for this to record a row and start the next match.
+        /// </summary>
+        public event System.Action<MatchState> MatchEnded;
+
         [Inject]
         public void Construct(ITeamRoster roster, MatchEvaluator evaluator)
         {
@@ -345,6 +351,8 @@ namespace ChaseGame.Match
                 var playerTeam = roster.PlayerCharacter != null ? roster.PlayerCharacter.Team : Team.Runner;
                 endView.Show(evaluator.ForPlayer(result, playerTeam));
             }
+
+            MatchEnded?.Invoke(result);
         }
 
         /// <summary>
