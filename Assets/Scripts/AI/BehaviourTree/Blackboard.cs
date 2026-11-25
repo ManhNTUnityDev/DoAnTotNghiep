@@ -31,5 +31,9 @@ namespace ChaseGame.AI.BehaviourTree
         public float SearchStartedAt;    // Now when the sweep began; 0 means not searching
         public List<Vector3> SearchPoints;
         public int SearchIndex;
+
+        // Behaviour Tree runner cover memory: the hiding place the condition node found, for
+        // the action node that follows it in the same tick.
+        public Vector3? CoverPoint;
     }
 }

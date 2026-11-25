@@ -45,9 +45,11 @@ namespace ChaseGame.Tests
         }
 
         [Test]
-        public void CountNodes_RunnerTree_Is5()
+        public void CountNodes_RunnerTree_Is9()
         {
-            Assert.AreEqual(5, BehaviourTreeStats.CountNodes(Make<RunnerAIBrain>(Team.Runner).Root));
+            // Selector + threat Sequence + its condition + inner Selector
+            // + hide Sequence + its condition and action + Flee + Wander
+            Assert.AreEqual(9, BehaviourTreeStats.CountNodes(Make<RunnerAIBrain>(Team.Runner).Root));
         }
 
         [Test]
