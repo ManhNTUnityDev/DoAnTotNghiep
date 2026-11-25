@@ -35,12 +35,14 @@ namespace ChaseGame.Tests
             return brain;
         }
 
+        // These counts are the figures the BT-vs-FSM comparison reports, so a structural
+        // change has to be a deliberate edit here rather than silent drift.
         [Test]
-        public void ChaserFsm_Has3StatesAnd6Transitions()
+        public void ChaserFsm_Has4StatesAnd11Transitions()
         {
             var fsm = ((FsmBrain)Make(Team.Chaser, BrainKind.Fsm)).Machine;
-            Assert.AreEqual(3, fsm.States.Count);
-            Assert.AreEqual(6, fsm.TransitionCount);
+            Assert.AreEqual(4, fsm.States.Count);
+            Assert.AreEqual(11, fsm.TransitionCount);
         }
 
         [Test]
