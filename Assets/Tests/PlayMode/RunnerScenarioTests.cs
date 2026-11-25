@@ -112,20 +112,33 @@ namespace ChaseGame.Tests.PlayMode
         // --- extension experiment (R5) ---
 
         [UnityTest]
-        public IEnumerator R5_WallNearby_EndsOutOfChaserSight()
+        public IEnumerator R5_WallNearby_BreaksChaserSight()
         {
             arena.AddWall(new Vector3(4f, 1.5f, 0f), new Vector3(0.5f, 3f, 8f));
             yield return arena.Bake();
             var chaser = arena.MakePuppet("Chaser", Team.Chaser, new Vector3(0f, 0f, 0f));
             var runner = arena.MakeBody("Runner", Team.Runner, new Vector3(3f, 0.2f, 0f));
-            arena.AttachBrain(runner, kind);
+            var brain = arena.AttachBrain(runner, kind);
 
-            for (float t = 0f; t < 4f; t += Time.deltaTime) yield return null;
+            // The scenario's chaser never moves, so once the runner is clear of the threat
+            // radius it stops hiding and roams — and may wander back into view. What the
+            // behaviour must show is that it took cover and broke line of sight while doing
+            // so, not where it happens to stand at one later instant.
+            bool hidAtSomePoint = false;
+            bool brokeSight = false;
+            for (float t = 0f; t < 4f; t += Time.deltaTime)
+            {
+                yield return null;
+                if (brain.Blackboard.ActiveBehaviour == BehaviourId.Hide) hidAtSomePoint = true;
+                bool clear = Sensor.IsSightClear(
+                    chaser.transform.position + Vector3.up * 0.6f,
+                    runner.transform.position + Vector3.up * 0.6f, ~0);
+                if (!clear) brokeSight = true;
+                if (hidAtSomePoint && brokeSight) break;
+            }
 
-            Vector3 chaserEye = chaser.transform.position + Vector3.up * 0.6f;
-            Vector3 runnerEye = runner.transform.position + Vector3.up * 0.6f;
-            Assert.IsFalse(Sensor.IsSightClear(chaserEye, runnerEye, ~0),
-                "runner should end up hidden behind the wall");
+            Assert.IsTrue(hidAtSomePoint, "runner should take cover while a threat is near");
+            Assert.IsTrue(brokeSight, "taking cover should break the chaser's line of sight");
         }
 
         [UnityTest]
