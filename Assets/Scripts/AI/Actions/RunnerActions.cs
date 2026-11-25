@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using ChaseGame.AI.BehaviourTree;
@@ -135,10 +136,31 @@ namespace ChaseGame.AI.Actions
             return bestPoint;
         }
 
+        // Where to look for cover, relative to the runner: a spiral of distinct directions whose
+        // distances sweep from half the radius out to the radius, so nearby cover is reachable
+        // and not just a far dash. Pure geometry, so the spread itself is unit-tested.
+        public static List<Vector3> CoverCandidateOffsets(int samples, float radius)
+        {
+            var offsets = new List<Vector3>();
+            if (samples <= 0 || radius <= 0f)
+            {
+                return offsets;
+            }
+
+            for (int i = 0; i < samples; i++)
+            {
+                float angle = 360f * i / samples;
+                float t = samples == 1 ? 1f : (float)i / (samples - 1);
+                float distance = Mathf.Lerp(radius * 0.5f, radius, t);
+                offsets.Add(Quaternion.Euler(0f, angle, 0f) * Vector3.forward * distance);
+            }
+
+            return offsets;
+        }
+
         // A reachable spot near the runner that the threat cannot see, and that is no closer to
-        // the threat than the runner already is. Candidates sit on a ring between half the
-        // radius and the radius; the nearest valid one wins, so the runner commits to the
-        // cheapest hiding place rather than sprinting across the map.
+        // the threat than the runner already is. The nearest valid candidate wins, so the runner
+        // commits to the cheapest hiding place rather than sprinting across the map.
         public static bool TryFindCoverPoint(
             Vector3 self, Vector3 threat, float radius, int samples, int mask, out Vector3 point)
         {
@@ -155,13 +177,9 @@ namespace ChaseGame.AI.Actions
             bool found = false;
             float bestDistance = float.MaxValue;
 
-            for (int i = 0; i < samples; i++)
+            foreach (var offset in CoverCandidateOffsets(samples, radius))
             {
-                float angle = 360f * i / samples;
-                float ring = Mathf.Lerp(radius * 0.5f, radius, (i % 2 == 0) ? 1f : 0.5f);
-                Vector3 candidate = self + Quaternion.Euler(0f, angle, 0f) * Vector3.forward * ring;
-
-                if (!NavMesh.SamplePosition(candidate, out var hit, 2.5f, NavMesh.AllAreas))
+                if (!NavMesh.SamplePosition(self + offset, out var hit, 2.5f, NavMesh.AllAreas))
                 {
                     continue;
                 }
@@ -171,7 +189,10 @@ namespace ChaseGame.AI.Actions
                     continue; // no safer than standing still
                 }
 
-                if (Sensor.IsSightClear(threatEye, hit.position + Vector3.up * eye, mask))
+                // Look past bodies: the runner's own collider usually sits between the threat
+                // and the best-shielded candidate, and treating that as "visible" would throw
+                // away exactly the candidate worth taking.
+                if (Sensor.IsSightClearPastBodies(threatEye, hit.position + Vector3.up * eye, mask))
                 {
                     continue; // the threat can still see it
                 }

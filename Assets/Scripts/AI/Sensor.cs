@@ -139,6 +139,51 @@ namespace ChaseGame.AI
         /// Shared with the runner's cover search, which asks the same question from the
         /// threat's point of view.
         /// </summary>
+        /// <summary>
+        /// Like <see cref="IsSightClear"/>, but it keeps going past characters and decoy lures
+        /// instead of stopping at the first one. Perception can stop early — a body in the way
+        /// means the target is roughly in the open either way — but the runner's cover search
+        /// asks about a point it is standing next to, so its own collider is nearly always the
+        /// first hit, and stopping there would call every shielded candidate visible.
+        /// </summary>
+        public static bool IsSightClearPastBodies(Vector3 fromEye, Vector3 toEye, int mask)
+        {
+            Vector3 to = toEye - fromEye;
+            float dist = to.magnitude;
+            const float bodyClearance = 0.45f;
+
+            if (dist <= bodyClearance * 2f)
+            {
+                return true;
+            }
+
+            Vector3 dir = to / dist;
+            if (mask == 0)
+            {
+                mask = ~0;
+            }
+
+            var hits = Physics.RaycastAll(
+                fromEye + dir * bodyClearance,
+                dir,
+                dist - bodyClearance * 2f,
+                mask,
+                QueryTriggerInteraction.Ignore);
+
+            foreach (var hit in hits)
+            {
+                if (hit.collider.GetComponentInParent<Character>() != null ||
+                    hit.collider.GetComponentInParent<DecoyLure>() != null)
+                {
+                    continue; // a body never blocks sight
+                }
+
+                return false; // real map geometry
+            }
+
+            return true;
+        }
+
         public static bool IsSightClear(Vector3 fromEye, Vector3 toEye, int mask)
         {
             Vector3 to = toEye - fromEye;
