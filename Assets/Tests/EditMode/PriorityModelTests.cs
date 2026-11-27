@@ -29,6 +29,16 @@ namespace ChaseGame.Tests
         }
 
         [Test]
+        public void OrderedFsm_TransitionCount_IsNTimesNMinus1()
+        {
+            for (int n = 2; n <= 10; n++)
+            {
+                Assert.AreEqual(n * (n - 1), PriorityModel.BuildOrderedFsm(n, 0).TransitionCount, $"n={n}");
+                Assert.AreEqual(n, PriorityModel.BuildOrderedFsm(n, 0).States.Count, $"n={n}");
+            }
+        }
+
+        [Test]
         public void AnyStateFsm_TransitionCount_IsN()
         {
             for (int n = 2; n <= 10; n++)
@@ -45,11 +55,12 @@ namespace ChaseGame.Tests
             Assert.AreEqual(2, PriorityModel.ExpectedAction(new[] { false, false }));
         }
 
-        // The fairness check: a generated FSM must pick the same behaviour as the tree in
+        // The fairness check: every generated FSM must pick the same behaviour as the tree in
         // every situation, from every state it could already be in. Without this, the
-        // transition counts could just mean the FSM was generated larger than it needed to be.
+        // transition counts could just mean the FSM was generated larger than it needed to be,
+        // and the order-leaning table could just be a cheaper machine that answers wrongly.
         [Test]
-        public void AllThreeModels_AgreeOnEveryFlagCombination_FromEveryStartState()
+        public void AllFourModels_AgreeOnEveryFlagCombination_FromEveryStartState()
         {
             for (int n = 2; n <= 9; n++)
             {
@@ -77,6 +88,10 @@ namespace ChaseGame.Tests
                         var anyBb = NewBlackboard(flags);
                         PriorityModel.BuildAnyStateFsm(n, initial).Tick(anyBb);
                         Assert.AreEqual(expected, anyBb.LastAction, $"any-state fsm n={n} bits={bits} start={initial}");
+
+                        var orderedBb = NewBlackboard(flags);
+                        PriorityModel.BuildOrderedFsm(n, initial).Tick(orderedBb);
+                        Assert.AreEqual(expected, orderedBb.LastAction, $"ordered fsm n={n} bits={bits} start={initial}");
                     }
                 }
             }

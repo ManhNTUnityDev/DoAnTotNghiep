@@ -165,8 +165,13 @@ namespace ChaseGame.Tests
             Assert.AreEqual(new Vector3(6f, 0f, 0f), spy.LastDestination);
         }
 
+        // Named for what it can actually fail on: that a finished sweep hands control back to
+        // Wander. It does NOT pin the time limit — EditMode has no NavMesh, so GenerateSearchPoints
+        // returns an empty list and the sweep ends by exhaustion whatever the clock says. The time
+        // limit is covered by ChaserScenarioTests.SearchTimeLimit* in PlayMode, where the points
+        // are real.
         [Test]
-        public void SearchTimesOut_ReturnsToWander()
+        public void SearchEnds_ReturnsToWander()
         {
             var (ch, spy, brain) = MakeChaser();
             var target = new GameObject("Runner");
@@ -181,7 +186,8 @@ namespace ChaseGame.Tests
             brain.TickForTests();
             Assert.AreEqual(BehaviourId.Search, brain.Blackboard.ActiveBehaviour);
 
-            // Past searchDurationSeconds (6 s by default) the sweep is abandoned.
+            // Advance well past searchDurationSeconds (6 s by default) so neither end condition
+            // is in doubt; with no NavMesh it is exhaustion that ends it here.
             brain.Blackboard.Now = 100f + 6.5f;
             brain.TickForTests();
 

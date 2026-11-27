@@ -23,6 +23,7 @@ namespace ChaseGame.AI.BehaviourTree
 
         public float Now;                // seconds, set by the host before each decision
         public int SightMask;            // the Sensor's obstacle mask, so cover checks agree with perception
+        public float EyeHeight;          // the Sensor's eye height, so cover checks sight the same line
         public BehaviourId ActiveBehaviour; // what the NPC is doing now; set by the shared actions
 
         // Behaviour Tree chaser search memory. A tree re-decides from the root every tick and

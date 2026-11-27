@@ -140,6 +140,29 @@ namespace ChaseGame.Tests.PlayMode
             if (Config != null) Object.DestroyImmediate(Config);
         }
 
+        // AIConfig's tuning values are [SerializeField] private, which is right for production
+        // but leaves a scenario unable to ask for a short search or a wide sweep. The reflection
+        // lives here, in one place, rather than in every test that needs to set it.
+        public void TuneSearch(float durationSeconds, int pointCount, float radius)
+        {
+            SetConfigField("searchDurationSeconds", durationSeconds);
+            SetConfigField("searchPointCount", pointCount);
+            SetConfigField("searchRadius", radius);
+        }
+
+        private void SetConfigField(string name, object value)
+        {
+            var field = typeof(AIConfig).GetField(
+                name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            if (field == null)
+            {
+                throw new InvalidOperationException(
+                    $"AIConfig has no field '{name}'; the scenario seam needs updating.");
+            }
+
+            field.SetValue(Config, value);
+        }
+
         public static float Planar(Vector3 a, Vector3 b) => AIBrain.PlanarDistance(a, b);
 
         public static void SweepStrays()

@@ -34,7 +34,8 @@ namespace ChaseGame.AI.Fsm
                 int samples = bb.Config != null ? bb.Config.CoverSampleCount : 12;
 
                 if (RunnerActions.TryFindCoverPoint(
-                    bb.Self.transform.position, bb.NearestThreat.position, radius, samples, bb.SightMask, out var found))
+                    bb.Self.transform.position, bb.NearestThreat.position, radius, samples,
+                    bb.SightMask, bb.EyeHeight, out var found))
                 {
                     point = found;
                     hasPoint = true;

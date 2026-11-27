@@ -1,6 +1,7 @@
 using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.TestTools;
 using ChaseGame.AI;
 using ChaseGame.Characters;
@@ -124,21 +125,70 @@ namespace ChaseGame.Tests.PlayMode
             // radius it stops hiding and roams — and may wander back into view. What the
             // behaviour must show is that it took cover and broke line of sight while doing
             // so, not where it happens to stand at one later instant.
+            //
+            // The two conditions must hold in the SAME frame. Checked independently, "sight was
+            // broken at some point" is satisfied by plain fleeing too: the runner runs away from
+            // the chaser at x=0 and ends up past the wall at x=4 either way, so the test would
+            // pass without cover ever being the reason.
             bool hidAtSomePoint = false;
-            bool brokeSight = false;
+            bool hidAndBrokeSight = false;
             for (float t = 0f; t < 4f; t += Time.deltaTime)
             {
                 yield return null;
-                if (brain.Blackboard.ActiveBehaviour == BehaviourId.Hide) hidAtSomePoint = true;
+                bool hiding = brain.Blackboard.ActiveBehaviour == BehaviourId.Hide;
+                if (hiding) hidAtSomePoint = true;
+
                 bool clear = Sensor.IsSightClear(
                     chaser.transform.position + Vector3.up * 0.6f,
                     runner.transform.position + Vector3.up * 0.6f, ~0);
-                if (!clear) brokeSight = true;
-                if (hidAtSomePoint && brokeSight) break;
+
+                if (hiding && !clear)
+                {
+                    hidAndBrokeSight = true;
+                    break;
+                }
             }
 
             Assert.IsTrue(hidAtSomePoint, "runner should take cover while a threat is near");
-            Assert.IsTrue(brokeSight, "taking cover should break the chaser's line of sight");
+            Assert.IsTrue(hidAndBrokeSight,
+                "the runner should be out of the chaser's sight while it is hiding, not merely at "
+                + "some later moment when it has run away");
+        }
+
+        // The hiding place is found by a condition and used by the action that follows it, and
+        // the two are only linked by running in the same tick — in the tree through
+        // bb.CoverPoint, in the table through a field on HideState that doubles as the transition
+        // predicate. Reordering either would break that link silently, so this pins the property
+        // both share: while hiding, the runner is heading somewhere the threat cannot see.
+        [UnityTest]
+        public IEnumerator Hiding_HeadsForAPointTheThreatCannotSee()
+        {
+            arena.AddWall(new Vector3(4f, 1.5f, 0f), new Vector3(0.5f, 3f, 8f));
+            yield return arena.Bake();
+            var chaser = arena.MakePuppet("Chaser", Team.Chaser, new Vector3(0f, 0f, 0f));
+            var runner = arena.MakeBody("Runner", Team.Runner, new Vector3(3f, 0.2f, 0f));
+            var brain = arena.AttachBrain(runner, kind);
+            var agent = runner.GetComponent<NavMeshAgent>();
+
+            bool sawHide = false;
+            for (float t = 0f; t < 3f; t += Time.deltaTime)
+            {
+                yield return null;
+                if (brain.Blackboard.ActiveBehaviour != BehaviourId.Hide || !agent.hasPath)
+                {
+                    continue;
+                }
+
+                sawHide = true;
+                Vector3 chaserEye = chaser.transform.position + Vector3.up * 0.6f;
+                Assert.IsFalse(
+                    Sensor.IsSightClearPastBodies(chaserEye, agent.destination + Vector3.up * 0.6f, ~0),
+                    "while hiding, the destination should be the sheltered point the condition found, "
+                    + "not a point in the open: " + agent.destination);
+                break;
+            }
+
+            Assert.IsTrue(sawHide, "runner never took cover, so the coupling was never exercised");
         }
 
         [UnityTest]

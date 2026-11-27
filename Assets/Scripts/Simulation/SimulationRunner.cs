@@ -79,6 +79,15 @@ namespace ChaseGame.Simulation
             string path = System.IO.Path.Combine(ProjectRoot, PendingPlanFile);
             if (!System.IO.File.Exists(path))
             {
+                // No plan means this is ordinary play, so nothing may be left over from a
+                // simulation. With "Reload Domain" turned off, static state survives between Play
+                // sessions, and an interrupted run would otherwise leave MatchSetup.Current set —
+                // spawning the next ordinary match with no human player at all.
+                if (instance == null)
+                {
+                    MatchSetup.Current = null;
+                }
+
                 return;
             }
 

@@ -45,9 +45,6 @@ namespace ChaseGame.AI.Actions
             return Mathf.Sqrt(dx * dx + dz * dz);
         }
 
-        public static bool TryRandomPoint(Vector3 center, float radius, out Vector3 result)
-            => TryRandomPoint(center, Vector3.zero, radius, out result);
-
         public static bool TryRandomPoint(Vector3 center, Vector3 forwardHint, float radius, out Vector3 result)
         {
             float minDist = Mathf.Max(2.2f, radius * 0.45f);

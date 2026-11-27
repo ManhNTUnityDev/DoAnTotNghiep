@@ -62,3 +62,35 @@ contains only that brain's decision code.
 fa8fc37    2 files changed, 39 insertions(+), 4 deletions(-)
 ae2bd87    1 file changed, 68 insertions(+), 2 deletions(-)
 ```
+
+## The same four commits counted as code lines
+
+`git diff --stat` counts every inserted line, comments and blank lines included, while the
+`loc` column of `static-metrics.csv` counts only lines that are neither blank nor a `//`
+comment. Two different numbers for the same thing read as an error, so both tables now
+report the second definition, and these are the figures the report uses.
+
+Measured with:
+
+```bash
+for c in 1d606dc 778fada fa8fc37 ae2bd87; do
+  git diff $c^ $c -- 'Assets/Scripts/*' | grep '^+' | grep -v '^+++'     | sed 's/^+//' | sed 's/^[[:space:]]*//' | grep -v '^$' | grep -v '^//' | wc -l
+done
+```
+
+| commit | brain | raw inserted | code lines | of which Blackboard |
+| --- | --- | --: | --: | --: |
+| 1d606dc | chaser BT  | 76 | 55 | 5 |
+| 778fada | chaser FSM | 76 | 54 | 0 |
+| fa8fc37 | runner BT  | 39 | 24 | 1 |
+| ae2bd87 | runner FSM | 68 | 46 | 0 |
+
+The Blackboard column is the part of each figure that is not in the brain's own file. A tree
+re-decides from the root every tick and keeps nothing between ticks, so what a state can hold
+in a private field has to live on the shared blackboard instead. Those lines are charged to
+the BT here, which is the honest reading: the FSM did not need them.
+
+This is the inconsistency to watch in `static-metrics.csv`, which lists `Blackboard` under
+`team=shared` at its full line count. 5 of those lines (`ChaserHadTarget`, `SearchStartedAt`,
+`SearchPoints`, `SearchIndex`, `CoverPoint`) exist only because of the trees, so the static
+table slightly understates the BT side and the diff table above does not.

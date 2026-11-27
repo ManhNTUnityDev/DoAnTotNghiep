@@ -16,6 +16,10 @@ namespace ChaseGame.Infrastructure
     {
         public static MatchSetupOptions Current;
 
-        public static MatchSetupOptions Effective => Current ?? new MatchSetupOptions();
+        // Read twice per spawned character, so the no-simulation case shares one instance
+        // rather than allocating a fresh default each time. Callers only read it.
+        private static readonly MatchSetupOptions Defaults = new MatchSetupOptions();
+
+        public static MatchSetupOptions Effective => Current ?? Defaults;
     }
 }

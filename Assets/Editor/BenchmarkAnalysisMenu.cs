@@ -32,17 +32,20 @@ namespace ChaseGame.EditorTools
         {
             var sb = new StringBuilder();
             sb.AppendLine("n,bt_nodes,fsm_pure_transitions,fsm_anystate_transitions," +
-                          "bt_ns_per_tick,fsm_pure_ns_per_tick,fsm_any_ns_per_tick");
+                          "bt_ns_per_tick,fsm_pure_ns_per_tick,fsm_any_ns_per_tick," +
+                          "fsm_ordered_ns_per_tick");
 
             for (int n = MinN; n <= MaxN; n++)
             {
                 var tree = PriorityModel.BuildTree(n);
                 var pure = PriorityModel.BuildPureFsm(n, 0);
                 var any = PriorityModel.BuildAnyStateFsm(n, 0);
+                var ordered = PriorityModel.BuildOrderedFsm(n, 0);
 
                 double treeNs = MeasureNsPerTick(n, bb => tree.Tick(bb));
                 double pureNs = MeasureNsPerTick(n, bb => pure.Tick(bb));
                 double anyNs = MeasureNsPerTick(n, bb => any.Tick(bb));
+                double orderedNs = MeasureNsPerTick(n, bb => ordered.Tick(bb));
 
                 sb.AppendLine(string.Join(",",
                     n.ToString(CultureInfo.InvariantCulture),
@@ -51,7 +54,8 @@ namespace ChaseGame.EditorTools
                     any.TransitionCount.ToString(CultureInfo.InvariantCulture),
                     treeNs.ToString("0.0", CultureInfo.InvariantCulture),
                     pureNs.ToString("0.0", CultureInfo.InvariantCulture),
-                    anyNs.ToString("0.0", CultureInfo.InvariantCulture)));
+                    anyNs.ToString("0.0", CultureInfo.InvariantCulture),
+                    orderedNs.ToString("0.0", CultureInfo.InvariantCulture)));
             }
 
             Write("scaling.csv", sb.ToString());

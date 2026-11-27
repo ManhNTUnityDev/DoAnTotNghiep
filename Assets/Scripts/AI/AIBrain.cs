@@ -45,6 +45,7 @@ namespace ChaseGame.AI
             }
 
             Blackboard.SightMask = sensor.ObstacleMask;
+            Blackboard.EyeHeight = sensor.EyeHeight;
 
             tickInterval = config != null && config.TickRateHz > 0f ? 1f / config.TickRateHz : 0.2f;
             accum = Random.Range(0f, tickInterval);

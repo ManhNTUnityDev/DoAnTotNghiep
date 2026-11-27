@@ -49,6 +49,10 @@ namespace ChaseGame.AI.Actions
             }
         }
 
+        // Also maintains bb.IsFleeing, the hysteresis flag that widens the radius once fleeing
+        // has begun. Called more than once per tick from different conditions, which is safe only
+        // because the answer cannot change inside one tick: nothing moves between those calls, so
+        // every call in a tick computes the same threshold and writes the same flag.
         public static bool ThreatNear(Blackboard bb)
         {
             if (bb.NearestThreat == null)
@@ -162,7 +166,8 @@ namespace ChaseGame.AI.Actions
         // the threat than the runner already is. The nearest valid candidate wins, so the runner
         // commits to the cheapest hiding place rather than sprinting across the map.
         public static bool TryFindCoverPoint(
-            Vector3 self, Vector3 threat, float radius, int samples, int mask, out Vector3 point)
+            Vector3 self, Vector3 threat, float radius, int samples, int mask, float eyeHeight,
+            out Vector3 point)
         {
             point = self;
             if (samples <= 0 || radius <= 0f)
@@ -170,7 +175,7 @@ namespace ChaseGame.AI.Actions
                 return false;
             }
 
-            const float eye = 0.6f;
+            float eye = eyeHeight > 0f ? eyeHeight : 0.6f;
             Vector3 threatEye = threat + Vector3.up * eye;
             float currentGap = AIActions.PlanarDistance(self, threat);
 
@@ -210,6 +215,8 @@ namespace ChaseGame.AI.Actions
         }
 
         // Head for a hiding place, using escape skills on the way exactly as fleeing does.
+        // Precondition: bb.NearestThreat is set. Only reachable behind a condition that already
+        // checked it, the same contract EscapeAndFlee and AimAndShoot are written to.
         public static NodeStatus TakeCover(Blackboard bb, Vector3 point)
         {
             bb.ActiveBehaviour = BehaviourId.Hide;
